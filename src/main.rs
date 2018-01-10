@@ -52,7 +52,7 @@ fn status() -> String {
     result_vec.join("\n")
 }
 
-fn status_routine(){
+fn status_trigger(){
     println!("{}", status());
 }
 
@@ -60,10 +60,28 @@ fn add(files: Vec<&str>) {
     shell(["git add", files.join(" ").as_str()].join(" ").as_str());
 }
 
-fn add_routine(matches: &clap::ArgMatches) {
+fn add_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("add").unwrap().values_of("files").unwrap().collect();
     add(files);
     println!("{}", status());
+}
+
+fn commit() {
+    shell("git commit");
+    println!("{}", shell("git log --decorate=short --oneline -1 --color"));
+}
+
+fn commit_with_message(message: &str) {
+    shell(["git commit -m", message].join(" ").as_str());
+    println!("{}", shell("git log --decorate=short --oneline -1 --color"));
+}
+
+fn commit_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("commit").unwrap().is_present("message") {
+        commit_with_message(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
+    } else {
+        commit();
+    }
 }
 
 fn main() {
@@ -82,12 +100,19 @@ fn main() {
                          .multiple(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("commit")
+                    .about("commit subcommand")
+                    .arg(Arg::with_name("message")
+                         .help("commit message")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
     match sub_command {
-        "status" => status_routine(),
-        "add" => add_routine(&matches),
+        "status" => status_trigger(),
+        "add" => add_trigger(&matches),
+        "commit" => commit_trigger(&matches),
         _ => println!("something else.")
     } 
 }
