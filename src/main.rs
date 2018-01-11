@@ -7,13 +7,51 @@ use std::process::Command;
 use colored::*;
 use regex::Regex;
 
-fn shell(command: &str) -> String {
-    let output = Command::new("sh")
+struct SystemResult {
+    stdout: String,
+    stderr: String,
+    status: i32
+}
+
+impl SystemResult {
+    fn new(output: std::process::Output) -> SystemResult {
+        let mut stdout: Vec<char> = std::str::from_utf8(&output.stdout[..]).unwrap().to_string().chars().collect();
+        stdout.pop();
+        let stdout: String = stdout.into_iter().collect();
+        let mut stderr: Vec<char> = std::str::from_utf8(&output.stderr[..]).unwrap().to_string().chars().collect();
+        stderr.pop();
+        let stderr: String = stderr.into_iter().collect();
+        let mut result = SystemResult {
+            stdout: stdout,
+            stderr: std::str::from_utf8(&output.stderr[..]).unwrap().to_string(),
+            status: 0
+        };
+        if result.stderr.chars().count() > 0 {
+            result.status = 1
+        }
+        result
+    }
+}
+
+fn system(command: &str) -> SystemResult {
+    let result = Command::new("sh")
         .arg("-c")
         .arg(command)
         .output()
         .expect("failed to execute process");
-    std::str::from_utf8(&output.stdout[..]).unwrap().to_string()
+    let result = SystemResult::new(result);
+    if result.status != 0 {
+        let emsg = [
+            "== ".red().to_string(),
+            "[+]ERROR".red().bold().to_string(),
+            " =====================".red().to_string()
+        ]
+        .join("");
+        println!("{}", emsg);
+        print!("{}", result.stderr);
+        println!("{}", "=================================".red().to_string());
+    }
+    result
 }
 
 fn regex(re_str: &str) -> Regex {
@@ -21,10 +59,7 @@ fn regex(re_str: &str) -> Regex {
 }
 
 fn status() -> String {
-    let result = shell("git status --short");
-    let mut result: Vec<char> = result.chars().collect();
-    result.pop();
-    let result: String = result.into_iter().collect();
+    let result = system("git status --short").stdout;
     let lines: Vec<&str> = result.split("\n").collect();
     let mut result_vec: Vec<String> = Vec::new();
     for x in lines {
@@ -59,7 +94,7 @@ fn status_trigger(){
 }
 
 fn add(files: Vec<&str>) {
-    shell(["git add", files.join(" ").as_str()].join(" ").as_str());
+    system(["git add", files.join(" ").as_str()].join(" ").as_str());
 }
 
 fn add_trigger(matches: &clap::ArgMatches) {
@@ -69,32 +104,32 @@ fn add_trigger(matches: &clap::ArgMatches) {
 }
 
 fn commit() -> String {
-    shell("git commit")
+    system("git commit").stdout
 }
 
 fn commit_with_message(message: &str) -> String {
-    shell(["git commit -m", message].join(" ").as_str())
+    system(["git commit -m", message].join(" ").as_str()).stdout
 }
 
 fn commit_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("commit").unwrap().is_present("message") {
         commit_with_message(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
-        println!("{}", shell("git log --decorate=short --oneline -1 --color"));
+        println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
     } else {
         commit();
-        println!("{}", shell("git log --decorate=short --oneline -1 --color"));
+        println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
     }
 }
 
 fn log(num: i32) -> String {
-    shell(["git log --decorate=short --oneline --color -", num.to_string().as_str()].join("").as_str())
+    system(["git log --decorate=short --oneline --color -", num.to_string().as_str()].join("").as_str()).stdout
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("log").unwrap().is_present("num") {
-        print!("{}", log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap()));
+        println!("{}", log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap()));
     } else {
-        print!("{}", log(3));
+        println!("{}", log(3));
     }
 }
 
