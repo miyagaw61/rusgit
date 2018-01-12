@@ -166,8 +166,14 @@ fn push(branch_name: &str) {
 
 fn push_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("push").unwrap().is_present("branch") {
-        let branch: &str = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
-        push(branch);
+        let branch_name: &str = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
+        println!("{}", ["[+]PUSH: ", branch_name].join("").as_str().red().bold().to_string());
+        print!("{}", "=========".yellow().bold().to_string());
+        for i in branch_name.chars() {
+            print!("{}", "=".yellow().bold().to_string());
+        }
+        println!("");
+        push(branch_name);
     } else {
         push("");
     }
