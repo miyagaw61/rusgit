@@ -1,11 +1,11 @@
 extern crate clap;
 extern crate colored;
-extern crate regex;
+//extern crate regex;
 
 use clap::{App, Arg, SubCommand};
 use std::process::Command;
 use colored::*;
-use regex::Regex;
+//use regex::Regex;
 
 struct SystemResult {
     stdout: String,
@@ -45,8 +45,7 @@ fn system(command: &str) -> SystemResult {
             "== ".red().to_string(),
             "[+]ERROR".red().bold().to_string(),
             " =====================".red().to_string()
-        ]
-        .join("");
+        ].join("");
         println!("{}", emsg);
         print!("{}", result.stderr);
         println!("{}", "=================================".red().to_string());
@@ -54,9 +53,9 @@ fn system(command: &str) -> SystemResult {
     result
 }
 
-fn regex(re_str: &str) -> Regex {
-    Regex::new(re_str).unwrap()
-}
+//fn regex(re_str: &str) -> Regex {
+//    Regex::new(re_str).unwrap()
+//}
 
 fn status() -> String {
     let result = system("git status --short").stdout;
@@ -133,6 +132,10 @@ fn log_trigger(matches: &clap::ArgMatches) {
     }
 }
 
+fn help() {
+    println!("{}", system("/mnt/c/Users/miyagaw61/home/repos/rusgit/target/debug/rusgit -h").stdout);
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -159,11 +162,12 @@ fn main() {
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
+
     match sub_command {
         "status" => status_trigger(),
         "add" => add_trigger(&matches),
         "commit" => commit_trigger(&matches),
         "log" => log_trigger(&matches),
-        _ => println!("something else.")
+        _ => help()
     } 
 }
