@@ -47,10 +47,19 @@ fn system(command: &str) -> SystemResult {
             " =====================".red().to_string()
         ].join("");
         println!("{}", emsg);
-        print!("{}", result.stderr);
+        println!("{}", result.stderr);
         println!("{}", "=================================".red().to_string());
     }
     result
+}
+
+fn system_allow_stderr(command: &str) -> SystemResult {
+    let result = Command::new("sh")
+        .arg("-c")
+        .arg(command)
+        .output()
+        .expect("failed to execute process");
+    SystemResult::new(result)
 }
 
 fn process(command: &str) -> std::process::ExitStatus {
@@ -68,8 +77,10 @@ fn process(command: &str) -> std::process::ExitStatus {
 
 fn status() {
     process("ls --color=always");
-    println!("{}", "\n[+]STATUS".red().to_string());
-    println!("{}", "=========".red().bold().to_string());
+    let status = system_allow_stderr("git status --short").stdout;
+    if status.chars().count() == 0 { std::process::exit(0); }
+    println!("{}", "\n[+]GIT_STATUS".red().to_string());
+    println!("{}", "=============".red().bold().to_string());
     process("git status --short");
 }
 
