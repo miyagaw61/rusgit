@@ -53,6 +53,15 @@ fn system(command: &str) -> SystemResult {
     result
 }
 
+fn process(command: &str) -> std::process::ExitStatus {
+    let mut child = Command::new("sh")
+        .arg("-c")
+        .arg(command)
+        .spawn()
+        .expect("failed to execute process");
+    child.wait().unwrap()
+}
+
 //fn regex(re_str: &str) -> Regex {
 //    Regex::new(re_str).unwrap()
 //}
