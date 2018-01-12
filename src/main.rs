@@ -155,11 +155,12 @@ fn ac_trigger(matches: &clap::ArgMatches) {
     process("git log --decorate=short --oneline -1 --color");
 }
 
-fn push(branch: &str) {
-    if branch == "" {
-        println!("now under development.");
+fn push(branch_name: &str) {
+    if branch_name == "" {
+        let now = branch("");
+        process(["git push origin", now.as_str()].join(" ").as_str());
     } else {
-        process(["git push origin", branch].join(" ").as_str());
+        process(["git push origin", branch_name].join(" ").as_str());
     }
 }
 
