@@ -67,6 +67,9 @@ fn process(command: &str) -> std::process::ExitStatus {
 //}
 
 fn status() {
+    process("ls --color=always");
+    println!("{}", "\n[+]STATUS".red().to_string());
+    println!("{}", "=========".red().bold().to_string());
     process("git status --short");
 }
 
