@@ -66,52 +66,22 @@ fn process(command: &str) -> std::process::ExitStatus {
 //    Regex::new(re_str).unwrap()
 //}
 
-fn status() -> String {
-    let result = system("git status --short").stdout;
-    let lines: Vec<&str> = result.split("\n").collect();
-    let mut result_vec: Vec<String> = Vec::new();
-    for x in lines {
-        if x.chars().count() < 3 {
-            std::process::exit(0);
-        }
-        let x_array: Vec<char> = x.chars().collect();
-        let mut r0: String = " ".to_string();
-        let mut r1: String = " ".to_string();
-        if x_array[0] == 'M' {
-            r0 = "M".green().bold().to_string();
-        }
-        if x_array[1] == 'M' {
-            r1 = "M".red().bold().to_string();
-        }
-        if x_array[0] == 'A' {
-            r0 = "A".green().bold().to_string();
-        }
-        if x_array[0] == 'A' {
-            r0 = "A".green().bold().to_string();
-        }
-        if x_array[0] == '?' && x_array[1] == '?'{
-            r0 = "?".red().bold().to_string();
-            r1 = "?".red().bold().to_string();
-        }
-        let x_string: String = x_array[2..].into_iter().collect();
-        let result_line: String = [r0, r1, x_string].join("");
-        result_vec.push(result_line);
-    }
-    result_vec.join("\n")
+fn status() {
+    process("git status --short");
 }
 
 fn status_trigger(){
-    println!("{}", status());
+    status();
 }
 
 fn add(files: Vec<&str>) {
-    system(["git add", files.join(" ").as_str()].join(" ").as_str());
+    process(["git add", files.join(" ").as_str()].join(" ").as_str());
 }
 
 fn add_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("add").unwrap().values_of("files").unwrap().collect();
     add(files);
-    println!("{}", status());
+    status();
 }
 
 fn commit(message: &str) {
@@ -132,20 +102,20 @@ fn commit_trigger(matches: &clap::ArgMatches) {
     }
 }
 
-fn log(num: i32) -> String {
-    system(["git log --decorate=short --oneline --color -", num.to_string().as_str()].join("").as_str()).stdout
+fn log(num: i32) {
+    process(["git log --decorate=short --oneline --color -", num.to_string().as_str()].join("").as_str());
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("log").unwrap().is_present("num") {
-        println!("{}", log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap()));
+        log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
     } else {
-        println!("{}", log(3));
+        log(3);
     }
 }
 
 fn help() {
-    println!("{}", system("/mnt/c/Users/miyagaw61/home/repos/rusgit/target/debug/rusgit -h").stdout);
+    process("/mnt/c/Users/miyagaw61/home/repos/rusgit/target/debug/rusgit -h");
 }
 
 fn diff(file: &str) {
@@ -168,7 +138,7 @@ fn ac(files: Vec<&str>) {
 fn ac_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("files").unwrap().collect();
     ac(files);
-    println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
+    process("git log --decorate=short --oneline -1 --color");
 }
 
 fn push(branch: &str) {
