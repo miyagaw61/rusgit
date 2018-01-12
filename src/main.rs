@@ -145,6 +145,18 @@ fn help() {
     println!("{}", system("/mnt/c/Users/miyagaw61/home/repos/rusgit/target/debug/rusgit -h").stdout);
 }
 
+fn diff(file: &str) {
+    process([
+          "git diff --color ",
+          file
+    ].join(" ").as_str());
+}
+
+fn diff_trigger(matches: &clap::ArgMatches) {
+    let file = matches.subcommand_matches("diff").unwrap().value_of("file").unwrap();
+    diff(file);
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -168,6 +180,11 @@ fn main() {
                          .help("num of logs")
                          )
                     )
+        .subcommand(SubCommand::with_name("diff")
+                    .arg(Arg::with_name("file")
+                         .help("file path")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -177,6 +194,7 @@ fn main() {
         "add" => add_trigger(&matches),
         "commit" => commit_trigger(&matches),
         "log" => log_trigger(&matches),
+        "diff" => diff_trigger(&matches),
         _ => help()
     } 
 }
