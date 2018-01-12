@@ -114,21 +114,21 @@ fn add_trigger(matches: &clap::ArgMatches) {
     println!("{}", status());
 }
 
-fn commit() -> String {
-    system("git commit").stdout
-}
-
-fn commit_with_message(message: &str) -> String {
-    system(["git commit -m", message].join(" ").as_str()).stdout
+fn commit(message: &str) {
+    if message == "" {
+        process("git commit 1> /dev/null");
+    } else {
+        process(["git commit -m", message, "1> /dev/null"].join(" ").as_str());
+    }
 }
 
 fn commit_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("commit").unwrap().is_present("message") {
-        commit_with_message(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
-        println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
+        commit(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
+        process("git log --decorate=short --oneline -1 --color");
     } else {
-        commit();
-        println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
+        commit("");
+        process("git log --decorate=short --oneline -1 --color");
     }
 }
 
@@ -162,7 +162,7 @@ fn diff_trigger(matches: &clap::ArgMatches) {
 
 fn ac(files: Vec<&str>) {
     add(files);
-    commit();
+    commit("");
 }
 
 fn ac_trigger(matches: &clap::ArgMatches) {
