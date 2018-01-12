@@ -171,6 +171,23 @@ fn ac_trigger(matches: &clap::ArgMatches) {
     println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
 }
 
+fn push(branch: &str) {
+    if branch == "" {
+        process("git push origin master");
+    } else {
+        process(["git push origin", branch].join(" "));
+    }
+}
+
+fn push_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("push").unwrap().is_present("branch") {
+        let branch: String = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
+        push(&branch);
+    } else {
+        push("");
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -204,6 +221,11 @@ fn main() {
                          .help("victim files")
                          )
                     )
+        .subcommand(SubCommand::with_name("push")
+                    .arg(Arg::with_name("branch")
+                         .help("branch name")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -215,6 +237,7 @@ fn main() {
         "log" => log_trigger(&matches),
         "diff" => diff_trigger(&matches),
         "ac" => ac_trigger(&matches),
+        "push" => push_trigger(&matches),
         _ => help()
     } 
 }
