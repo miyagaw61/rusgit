@@ -157,7 +157,7 @@ fn ac_trigger(matches: &clap::ArgMatches) {
 
 fn push(branch: &str) {
     if branch == "" {
-        println!("now under develop.");
+        println!("now under development.");
     } else {
         process(["git push origin", branch].join(" ").as_str());
     }
