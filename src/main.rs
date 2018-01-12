@@ -23,7 +23,7 @@ impl SystemResult {
         let stderr: String = stderr.into_iter().collect();
         let mut result = SystemResult {
             stdout: stdout,
-            stderr: std::str::from_utf8(&output.stderr[..]).unwrap().to_string(),
+            stderr: stderr,
             status: 0
         };
         if result.stderr.chars().count() > 0 {
