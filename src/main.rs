@@ -71,6 +71,9 @@ fn status() -> String {
     let lines: Vec<&str> = result.split("\n").collect();
     let mut result_vec: Vec<String> = Vec::new();
     for x in lines {
+        if x.chars().count() < 3 {
+            std::process::exit(0);
+        }
         let x_array: Vec<char> = x.chars().collect();
         let mut r0: String = " ".to_string();
         let mut r1: String = " ".to_string();
@@ -157,6 +160,17 @@ fn diff_trigger(matches: &clap::ArgMatches) {
     diff(file);
 }
 
+fn ac(files: Vec<&str>) {
+    add(files);
+    commit();
+}
+
+fn ac_trigger(matches: &clap::ArgMatches) {
+    let files: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("files").unwrap().collect();
+    ac(files);
+    println!("{}", system("git log --decorate=short --oneline -1 --color").stdout);
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -185,6 +199,11 @@ fn main() {
                          .help("file path")
                          )
                     )
+        .subcommand(SubCommand::with_name("ac")
+                    .arg(Arg::with_name("files")
+                         .help("victim files")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -195,6 +214,7 @@ fn main() {
         "commit" => commit_trigger(&matches),
         "log" => log_trigger(&matches),
         "diff" => diff_trigger(&matches),
+        "ac" => ac_trigger(&matches),
         _ => help()
     } 
 }
