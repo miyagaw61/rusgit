@@ -79,8 +79,8 @@ fn status() {
     process("ls --color=always");
     let status = system_allow_stderr("git status --short").stdout;
     if status.chars().count() == 0 { std::process::exit(0); }
-    println!("{}", "\n[+]GIT_STATUS".red().to_string());
-    println!("{}", "=============".red().bold().to_string());
+    println!("{}", "\n[+]GIT_STATUS".red().bold().to_string());
+    println!("{}", "=============".yellow().bold().to_string());
     process("git status --short 2> /dev/null");
 }
 
@@ -196,8 +196,8 @@ fn branch(branch_name: &str) -> String {
     } else {
         let before = branch("");
         let before = before.as_str().red().bold().to_string();
-        process(["git checkout", branch_name, "2> /dev/null"].join(" ").as_str());
-        let arrow = " --> ".yellow().bold().to_string();
+        process(["git checkout", branch_name, "1> /dev/null 2> /dev/null"].join(" ").as_str());
+        let arrow = " -> ".yellow().bold().to_string();
         println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
     }
     "".to_string()
