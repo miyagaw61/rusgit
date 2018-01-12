@@ -173,16 +173,16 @@ fn ac_trigger(matches: &clap::ArgMatches) {
 
 fn push(branch: &str) {
     if branch == "" {
-        process("git push origin master");
+        println!("now under develop.");
     } else {
-        process(["git push origin", branch].join(" "));
+        process(["git push origin", branch].join(" ").as_str());
     }
 }
 
 fn push_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("push").unwrap().is_present("branch") {
-        let branch: String = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
-        push(&branch);
+        let branch: &str = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
+        push(branch);
     } else {
         push("");
     }
