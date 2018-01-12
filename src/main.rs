@@ -81,7 +81,7 @@ fn status() {
     if status.chars().count() == 0 { std::process::exit(0); }
     println!("{}", "\n[+]GIT_STATUS".red().to_string());
     println!("{}", "=============".red().bold().to_string());
-    process("git status --short");
+    process("git status --short 2> /dev/null");
 }
 
 fn status_trigger(){
