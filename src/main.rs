@@ -158,6 +158,39 @@ fn push_trigger(matches: &clap::ArgMatches) {
     }
 }
 
+fn branch(branch_name: &str) -> String {
+    if branch_name == "" {
+        let branches = system("git branch").stdout;
+        let branches = branches.split("\n");
+        for x in branches {
+            let x_chars: Vec<char> = x.chars().collect();
+            let x_chars: &[char] = &x_chars;
+            if x_chars[0] != '*' {
+                continue;
+            }
+            let now: &[char] = &x_chars[2..];
+            let now: String = now.into_iter().collect();
+            return now
+        }
+    } else {
+        let before = branch("");
+        let before = before.as_str().red().bold().to_string();
+        process(["git checkout", branch_name, "2> /dev/null"].join(" ").as_str());
+        let arrow = " --> ".yellow().bold().to_string();
+        println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
+    }
+    "".to_string()
+}
+
+fn branch_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("branch").unwrap().is_present("branch") {
+        let branch_name = matches.subcommand_matches("branch").unwrap().value_of("branch").unwrap();
+        branch(branch_name);
+    } else {
+        process("git branch");
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -199,6 +232,11 @@ fn main() {
                          .help("branch name")
                          )
                     )
+        .subcommand(SubCommand::with_name("branch")
+                    .arg(Arg::with_name("branch")
+                         .help("branch name")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -209,8 +247,9 @@ fn main() {
         "commit" => commit_trigger(&matches),
         "log" => log_trigger(&matches),
         "diff" => diff_trigger(&matches),
-        "ac" => ac_trigger(&matches),
         "push" => push_trigger(&matches),
+        "branch" => branch_trigger(&matches),
+        "ac" => ac_trigger(&matches),
         _ => help()
     } 
 }
