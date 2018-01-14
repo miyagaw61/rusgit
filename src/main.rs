@@ -228,6 +228,36 @@ fn branch_trigger(matches: &clap::ArgMatches) {
     }
 }
 
+fn pull(branch_name: &str, mr: &str) {
+    let branch_name: String = match branch_name {
+        "" => branch(""),
+        _ => branch_name.to_string()
+    };
+    process("git fetch");
+    let cmd = match mr {
+        "merge" => ["git merge origin/", &branch_name].join(""),
+        "rebase" => ["git rebase origin/", &branch_name].join(""),
+        _ => "".to_string()
+    };
+    process(&cmd);
+}
+
+fn pull_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("pull").unwrap().is_present("branch") {
+        if matches.subcommand_matches("pull").unwrap().is_present("rebase") {
+            pull(matches.subcommand_matches("pull").unwrap().value_of("branch").unwrap(), "rebase");
+        } else {
+            pull(matches.subcommand_matches("pull").unwrap().value_of("branch").unwrap(), "merge");
+        }
+    } else {
+        if matches.subcommand_matches("pull").unwrap().is_present("rebase") {
+            pull("", "rebase");
+        } else {
+            pull("", "merge");
+        }
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -291,6 +321,16 @@ fn main() {
                          .takes_value(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("pull")
+                    .arg(Arg::with_name("branch")
+                         .help("branch name")
+                         )
+                    .arg(Arg::with_name("rebase")
+                         .help("git pull --rebase")
+                         .short("r")
+                         .long("rebase")
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -303,6 +343,7 @@ fn main() {
         "diff" => diff_trigger(&matches),
         "push" => push_trigger(&matches),
         "branch" => branch_trigger(&matches),
+        "pull" => pull_trigger(&matches),
         "ac" => ac_trigger(&matches),
         _ => help()
     } 
