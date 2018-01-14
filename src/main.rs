@@ -75,17 +75,25 @@ fn process(command: &str) -> std::process::ExitStatus {
 //    Regex::new(re_str).unwrap()
 //}
 
-fn status() {
+fn status(mode: &str) {
     process("ls --color=always");
     let status = system_allow_stderr("git status --short").stdout;
     if status.chars().count() == 0 { std::process::exit(0); }
     println!("{}", "\n[+]GIT_STATUS".red().bold().to_string());
     println!("{}", "=============".yellow().bold().to_string());
-    process("git status --short 2> /dev/null");
+    if mode == "verbose" {
+        process("git status");
+    } else {
+        process("git status --short 2> /dev/null");
+    }
 }
 
-fn status_trigger(){
-    status();
+fn status_trigger(matches: &clap::ArgMatches){
+    if matches.subcommand_matches("status").unwrap().is_present("verbose") {
+        status("verbose");
+    } else {
+        status("");
+    }
 }
 
 fn add(files: Vec<&str>) {
@@ -95,7 +103,7 @@ fn add(files: Vec<&str>) {
 fn add_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("add").unwrap().values_of("files").unwrap().collect();
     add(files);
-    status();
+    status("");
 }
 
 fn commit(message: &str) {
@@ -263,7 +271,13 @@ fn main() {
         .version("0.1.0")
         .author("miyagaw61 <miyagaw61@gmail.com>")
         .about("Git Wrapper in Rust")
-        .subcommand(SubCommand::with_name("status"))
+        .subcommand(SubCommand::with_name("status")
+                    .arg(Arg::with_name("verbose")
+                         .help("verbose status")
+                         .short("v")
+                         .long("verbose")
+                         )
+                    )
         .subcommand(SubCommand::with_name("add")
                     .arg(Arg::with_name("files")
                          .help("victim files")
@@ -336,7 +350,7 @@ fn main() {
     let sub_command = matches.subcommand_name().unwrap_or("");
 
     match sub_command {
-        "status" => status_trigger(),
+        "status" => status_trigger(&matches),
         "add" => add_trigger(&matches),
         "commit" => commit_trigger(&matches),
         "log" => log_trigger(&matches),
