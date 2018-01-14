@@ -179,27 +179,37 @@ fn push_trigger(matches: &clap::ArgMatches) {
     }
 }
 
-fn branch(branch_name: &str) -> String {
-    if branch_name == "" {
-        let branches = system("git branch").stdout;
-        let branches = branches.split("\n");
-        for x in branches {
-            let x_chars: Vec<char> = x.chars().collect();
-            let x_chars: &[char] = &x_chars;
-            if x_chars[0] != '*' {
-                continue;
-            }
-            let now: &[char] = &x_chars[2..];
-            let now: String = now.into_iter().collect();
-            return now
+fn get_branches() -> Vec<String> {
+    let mut branches: Vec<String> = Vec::new();
+    branches.push(branch(""));
+    let iter = system("git branch").stdout;
+    let iter = iter.split("\n");
+    for x in iter {
+        let x_chars: Vec<char> = x.chars().collect();
+        let x_chars: &[char] = &x_chars;
+        if x_chars[0] == '*' {
+            continue;
         }
-    } else {
-        let before = branch("");
-        let before = before.as_str().red().bold().to_string();
-        process(["git checkout", branch_name, "1> /dev/null 2> /dev/null"].join(" ").as_str());
-        let arrow = " -> ".yellow().bold().to_string();
-        println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
+        branches.push(x[2..].to_string());
     }
+    branches
+}
+
+fn branch(branch_name: &str) -> String {
+    let before = system("git symbolic-ref --short HEAD 2> /dev/null").stdout;
+    if branch_name == "" {
+        return before
+    }
+    let branches = get_branches();
+    if ! branches.contains(&branch_name.to_string()) {
+        process(["git branch", branch_name].join(" ").as_str());
+        println!("{}", ["Created branch", branch_name].join(" "));
+        return "".to_string()
+    }
+    let before = before.as_str().red().bold().to_string();
+    process(["git checkout", branch_name, "1> /dev/null 2> /dev/null"].join(" ").as_str());
+    let arrow = " -> ".yellow().bold().to_string();
+    println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
     "".to_string()
 }
 
@@ -207,6 +217,12 @@ fn branch_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("branch").unwrap().is_present("branch") {
         let branch_name = matches.subcommand_matches("branch").unwrap().value_of("branch").unwrap();
         branch(branch_name);
+    } else if matches.subcommand_matches("branch").unwrap().is_present("delete") {
+        process(["git branch --delete", matches.subcommand_matches("branch").unwrap().value_of("delete").unwrap()].join(" ").as_str());
+    } else if matches.subcommand_matches("branch").unwrap().is_present("DELETE") {
+        process(["git branch -D", matches.subcommand_matches("branch").unwrap().value_of("DELETE").unwrap()].join(" ").as_str());
+    } else if matches.subcommand_matches("branch").unwrap().is_present("remote-delete") {
+        process(["git push --delete origin", matches.subcommand_matches("branch").unwrap().value_of("remote-delete").unwrap()].join(" ").as_str());
     } else {
         process("git branch");
     }
@@ -256,6 +272,23 @@ fn main() {
         .subcommand(SubCommand::with_name("branch")
                     .arg(Arg::with_name("branch")
                          .help("branch name")
+                         )
+                    .arg(Arg::with_name("delete")
+                         .help("delete branch")
+                         .short("d")
+                         .long("delete")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("DELETE")
+                         .help("force delete branch")
+                         .short("D")
+                         .long("DELETE")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("remote-delete")
+                         .help("delete remote branch")
+                         .long("remote-delete")
+                         .takes_value(true)
                          )
                     )
         .get_matches();
