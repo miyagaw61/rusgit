@@ -1,11 +1,11 @@
 extern crate clap;
 extern crate colored;
-//extern crate regex;
+extern crate regex;
 
 use clap::{App, Arg, SubCommand};
 use std::process::Command;
 use colored::*;
-//use regex::Regex;
+use regex::Regex;
 
 struct SystemResult {
     stdout: String,
@@ -71,8 +71,8 @@ fn process(command: &str) -> std::process::ExitStatus {
     child.wait().unwrap()
 }
 
-//fn regex(re_str: &str) -> Regex {
-//    Regex::new(re_str).unwrap()
+//fn regex(re: &str) -> Regex {
+//    Regex::new(re).unwrap()
 //}
 
 fn status(mode: &str) {
@@ -147,8 +147,21 @@ fn diff(file: &str) {
     ].join(" ").as_str());
 }
 
+fn diff_hash(hash: &str) {
+    let cmd = ["git diff ", hash, "^..", hash].join("");
+    process(cmd.as_str());
+}
+
 fn diff_trigger(matches: &clap::ArgMatches) {
     let file = matches.subcommand_matches("diff").unwrap().value_of("file").unwrap();
+    let file_chars = file.chars();
+    let re: Regex = Regex::new(r"[0123456789abcdef]{7}").unwrap();
+    if file_chars.count() == 7 {
+        if re.is_match(file) {
+            diff_hash(file);
+            std::process::exit(0);
+        }
+    }
     diff(file);
 }
 
