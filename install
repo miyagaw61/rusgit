@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+if test ! "$(which cargol)" ;then
+    echo "Please install cargo."
+    echo "\n[+]try: "
+    echo "  curl https://sh.rustup.rs -sSf | sh #This command can download cargo to \$HOME/.cargo"
+    echo "  source \$HOME/.cargo/env #You should write this to bashrc."
+    exit
+fi
+cargo install --git https://github.com/miyagaw61/rusgit
