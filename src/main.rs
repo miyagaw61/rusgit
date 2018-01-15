@@ -218,7 +218,7 @@ fn push_trigger(matches: &clap::ArgMatches) {
         let branch_name: &str = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
         println!("{}", ["[+]PUSH: ", branch_name].join("").as_str().red().bold().to_string());
         print!("{}", "=========".yellow().bold().to_string());
-        for i in branch_name.chars() {
+        for _ in branch_name.chars() {
             print!("{}", "=".yellow().bold().to_string());
         }
         println!("");
