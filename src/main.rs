@@ -161,10 +161,9 @@ fn diff_cached(file: &str) {
 }
 
 fn diff_trigger(matches: &clap::ArgMatches) {
-    let file = matches.subcommand_matches("diff").unwrap().value_of("file").unwrap();
-    let file_chars = file.chars();
     let re: Regex = Regex::new(r"[0123456789abcdef]{7}").unwrap();
-    if file_chars.count() == 7 {
+    let file = matches.subcommand_matches("diff").unwrap().value_of("file | ..<branch> | <branch>..").unwrap();
+    if file.chars().count() == 7 {
         if re.is_match(file) {
             diff_hash(file);
             std::process::exit(0);
@@ -172,9 +171,26 @@ fn diff_trigger(matches: &clap::ArgMatches) {
     }
     if matches.subcommand_matches("diff").unwrap().is_present("cached") {
         diff_cached(file);
-    } else {
-        diff(file);
+        std::process::exit(0);
     }
+    let file_vec: Vec<char> = file.chars().collect();
+    if file.contains("..") {
+        let chars_count = file.chars().count();
+        if file_vec[0] == '.' && file_vec[1] == '.' {
+            diff([
+                 "HEAD..origin/".to_string(),
+                 file_vec[2..].iter().collect()
+            ].join("").as_str());
+        } else if file_vec[chars_count-1] == '.' && file_vec[chars_count-2] == '.' {
+            diff([
+                 "origin/".to_string(),
+                 file_vec[..chars_count-2].iter().collect(),
+                 "..HEAD".to_string()
+            ].join("").as_str());
+        }
+        std::process::exit(0);
+    }
+    diff(file);
 }
 
 fn ac(files: Vec<&str>) {
@@ -321,8 +337,7 @@ fn main() {
                          )
                     )
         .subcommand(SubCommand::with_name("diff")
-                    .arg(Arg::with_name("file")
-                         .help("file path")
+                    .arg(Arg::with_name("file | ..<branch> | <branch>..")
                          .required(true)
                          )
                     .arg(Arg::with_name("cached")
