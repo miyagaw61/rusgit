@@ -115,7 +115,9 @@ fn commit(message: &str) {
 }
 
 fn commit_trigger(matches: &clap::ArgMatches) {
-    if matches.subcommand_matches("commit").unwrap().is_present("message") {
+    if matches.subcommand_matches("commit").unwrap().is_present("amend") {
+        process("git commit --amend");
+    } else if matches.subcommand_matches("commit").unwrap().is_present("message") {
         commit(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
         process("git log --decorate=short --oneline -1 --color");
     } else {
@@ -329,6 +331,11 @@ fn main() {
         .subcommand(SubCommand::with_name("commit")
                     .arg(Arg::with_name("message")
                          .help("commit message")
+                         )
+                    .arg(Arg::with_name("amend")
+                         .help("git commit --amend")
+                         .short("a")
+                         .long("amend")
                          )
                     )
         .subcommand(SubCommand::with_name("log")
