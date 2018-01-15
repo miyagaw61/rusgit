@@ -142,7 +142,7 @@ fn help() {
 
 fn diff(file: &str) {
     process([
-          "git diff --color ",
+          "git diff",
           file
     ].join(" ").as_str());
 }
@@ -150,6 +150,14 @@ fn diff(file: &str) {
 fn diff_hash(hash: &str) {
     let cmd = ["git diff ", hash, "^..", hash].join("");
     process(cmd.as_str());
+}
+
+fn diff_cached(file: &str) {
+    process([
+            "git diff",
+            file,
+            "--cached"
+    ].join(" ").as_str());
 }
 
 fn diff_trigger(matches: &clap::ArgMatches) {
@@ -162,7 +170,11 @@ fn diff_trigger(matches: &clap::ArgMatches) {
             std::process::exit(0);
         }
     }
-    diff(file);
+    if matches.subcommand_matches("diff").unwrap().is_present("cached") {
+        diff_cached(file);
+    } else {
+        diff(file);
+    }
 }
 
 fn ac(files: Vec<&str>) {
@@ -312,6 +324,11 @@ fn main() {
                     .arg(Arg::with_name("file")
                          .help("file path")
                          .required(true)
+                         )
+                    .arg(Arg::with_name("cached")
+                         .help("git diff --cached")
+                         .short("c")
+                         .long("cached")
                          )
                     )
         .subcommand(SubCommand::with_name("ac")
