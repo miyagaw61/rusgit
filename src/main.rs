@@ -401,6 +401,13 @@ alias rpull=\"rusgit pull\"\
 ");
 }
 
+fn clone(matches: &clap::ArgMatches) {
+    process([
+            "git clone ",
+            "https://github.com/",
+            matches.subcommand_matches("clone").unwrap().value_of("repo").unwrap()
+    ].join("").as_str());
+}
 
 fn main() {
     let matches = App::new("rusgit")
@@ -529,6 +536,13 @@ fn main() {
         .subcommand(SubCommand::with_name("alias")
                     .about("print aliases")
                     )
+        .subcommand(SubCommand::with_name("clone")
+                    .about("improved git-clone")
+                    .arg(Arg::with_name("repo")
+                         .help("repository name")
+                         .required(true)
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -546,6 +560,7 @@ fn main() {
         "rebase" => rebase_trigger(&matches),
         "ac" => ac_trigger(&matches),
         "alias" => alias(),
+        "clone" => clone(&matches),
         _ => help()
     } 
 }
