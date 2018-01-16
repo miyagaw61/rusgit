@@ -150,7 +150,11 @@ fn log_trigger(matches: &clap::ArgMatches) {
 }
 
 fn help() {
-    process("/mnt/c/Users/miyagaw61/home/repos/rusgit/target/debug/rusgit -h");
+    println!("\
+USAGE:
+    rusgit [SUBCOMMAND]
+rusgit -h for help\
+");
 }
 
 fn diff(file: &str) {
