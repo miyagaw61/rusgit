@@ -129,12 +129,23 @@ fn commit_trigger(matches: &clap::ArgMatches) {
 fn log(num: i32) {
     process(["git log --decorate=short --oneline -", num.to_string().as_str()].join("").as_str());
 }
+fn log_graph(num: i32) {
+    process(["git log --decorate=short --graph --oneline -", num.to_string().as_str()].join("").as_str());
+}
 
 fn log_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("log").unwrap().is_present("num") {
-        log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
+        if matches.subcommand_matches("log").unwrap().is_present("graph") {
+            log_graph(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
+        } else {
+            log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
+        }
     } else {
-        log(3);
+        if matches.subcommand_matches("log").unwrap().is_present("graph") {
+            log_graph(3);
+        } else {
+            log(3);
+        }
     }
 }
 
@@ -365,6 +376,11 @@ fn main() {
         .subcommand(SubCommand::with_name("log")
                     .arg(Arg::with_name("num")
                          .help("num of logs")
+                         )
+                    .arg(Arg::with_name("graph")
+                         .help("graph mode")
+                         .short("g")
+                         .long("graph")
                          )
                     )
         .subcommand(SubCommand::with_name("diff")
