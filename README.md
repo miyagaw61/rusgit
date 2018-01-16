@@ -43,3 +43,7 @@ If it is the same alias as above, you can also set it with the following command
 ```Bash
 eval "$(rusgit alias)"
 ```
+
+# Usage
+
+https://qiita.com/miyagaw61/items/893fd5a2115d0d2429de
