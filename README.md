@@ -11,8 +11,8 @@ This is faster than git2nd.
 ### Install cargo
 
 ```
-curl https://sh.rustup.rs -sSf | sh #This command can download cargo to $HOME/.cargo"
-source $HOME/.cargo/env #You should write this to bashrc."
+curl https://sh.rustup.rs -sSf | sh #This command can download cargo to $HOME/.cargo
+source $HOME/.cargo/env #You should write this to bashrc.
 ```
 
 ### Install rusgit
