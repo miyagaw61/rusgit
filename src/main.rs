@@ -413,7 +413,7 @@ fn main() {
                          )
                     )
         .subcommand(SubCommand::with_name("ac")
-                    .about("rusgit add -> rusgit commit")
+                    .about("rusgit add and rusgit commit")
                     .arg(Arg::with_name("files")
                          .help("victim files")
                          .required(true)
