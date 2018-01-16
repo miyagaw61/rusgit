@@ -212,14 +212,21 @@ fn diff_trigger(matches: &clap::ArgMatches) {
     diff(file);
 }
 
-fn ac(files: Vec<&str>) {
+fn ac(files: Vec<&str>, message: &str) {
     add(files);
-    commit("");
+    commit(message);
 }
 
 fn ac_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("files").unwrap().collect();
-    ac(files);
+    let message: String = if matches.subcommand_matches("ac").unwrap().is_present("message") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("message").unwrap().collect();
+        let message: String = message.join(" ");
+        message
+    } else {
+        "".to_string()
+    };
+    ac(files, &message);
     process("git log --decorate=short --oneline -1 --color");
 }
 
@@ -410,6 +417,13 @@ fn main() {
                     .arg(Arg::with_name("files")
                          .help("victim files")
                          .required(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("message")
+                         .help("commit message")
+                         .short("m")
+                         .long("message")
+                         .takes_value(true)
                          .multiple(true)
                          )
                     )
