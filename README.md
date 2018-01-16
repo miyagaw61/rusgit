@@ -10,7 +10,7 @@ This is faster than git2nd.
 
 ### Install cargo
 
-```
+```Bash
 curl https://sh.rustup.rs -sSf | sh #This command can download cargo to $HOME/.cargo
 source $HOME/.cargo/env #You should write this to bashrc.
 ```
@@ -18,14 +18,14 @@ source $HOME/.cargo/env #You should write this to bashrc.
 ### Install rusgit
 
 
-```
+```Bash
 cargo install --git https://github.com/miyagaw61/rusgit
 ```
 
 ### You may become happy if you execute this command
 
 
-```
+```Bash
 #alias rusgit
 alias rs="rusgit status"
 alias ra="rusgit add"
