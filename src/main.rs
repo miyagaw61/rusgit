@@ -127,7 +127,7 @@ fn commit_trigger(matches: &clap::ArgMatches) {
 }
 
 fn log(num: i32) {
-    process(["git log --decorate=short --oneline --color -", num.to_string().as_str()].join("").as_str());
+    process(["git log --decorate=short --oneline -", num.to_string().as_str()].join("").as_str());
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
