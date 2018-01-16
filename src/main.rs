@@ -328,6 +328,26 @@ fn pull(branch_name: &str, mr: &str) {
 }
 
 fn pull_trigger(matches: &clap::ArgMatches) {
+    let branch_name: String = if matches.subcommand_matches("pull").unwrap().is_present("branch") {
+        matches.subcommand_matches("pull").unwrap().value_of("branch").unwrap().to_string()
+    } else {
+        branch("")
+    };
+    if matches.subcommand_matches("pull").unwrap().is_present("rebase") {
+        println!("{}", ["[+]REBASE-PULL: ", branch_name.as_str()].join("").as_str().red().bold().to_string());
+        print!("{}",    "================".yellow().bold().to_string());
+        for _ in branch_name.chars() {
+            print!("{}", "=".yellow().bold().to_string());
+        }
+        println!("");
+    } else {
+        println!("{}", ["[+]PULL: ", branch_name.as_str()].join("").as_str().red().bold().to_string());
+        print!("{}",    "=========".yellow().bold().to_string());
+        for _ in branch_name.chars() {
+            print!("{}", "=".yellow().bold().to_string());
+        }
+        println!("");
+    }
     if matches.subcommand_matches("pull").unwrap().is_present("branch") {
         if matches.subcommand_matches("pull").unwrap().is_present("rebase") {
             pull(matches.subcommand_matches("pull").unwrap().value_of("branch").unwrap(), "rebase");
