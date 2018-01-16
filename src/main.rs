@@ -282,9 +282,16 @@ fn branch(branch_name: &str) -> String {
         return "".to_string()
     }
     let before = before.as_str().red().bold().to_string();
-    let result = system(["git checkout", branch_name, "1> /dev/null"].join(" ").as_str());
+    let result = system_allow_stderr(["git checkout", branch_name, "1> /dev/null"].join(" ").as_str());
     if result.stderr != "" {
-        std::process::exit(0);
+        let stderr: Vec<&str> = result.stderr.split("\n").collect();
+        let stderr_count = stderr.iter().count();
+        if !(stderr_count == 1 && stderr[0].contains("Switched")) {
+            println!("{}", "[+]ERROR:".red().bold().to_string());
+            println!("{}", "========:".yellow().bold().to_string());
+            println!("{}", result.stderr.red().bold().to_string());
+            std::process::exit(0);
+        }
     }
     let arrow = " -> ".yellow().bold().to_string();
     println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
