@@ -309,6 +309,18 @@ fn pull_trigger(matches: &clap::ArgMatches) {
     }
 }
 
+fn merge_trigger(matches: &clap::ArgMatches) {
+    let branch_name = matches.subcommand_matches("merge").unwrap().value_of("branch").unwrap();
+    merge(branch_name);
+}
+
+fn merge(branch_name: &str) {
+    process([
+            "git merge",
+            branch_name
+    ].join(" ").as_str());
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -397,6 +409,12 @@ fn main() {
                          .long("rebase")
                          )
                     )
+        .subcommand(SubCommand::with_name("merge")
+                    .arg(Arg::with_name("branch")
+                         .help("branch name")
+                         .required(true)
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -410,6 +428,7 @@ fn main() {
         "push" => push_trigger(&matches),
         "branch" => branch_trigger(&matches),
         "pull" => pull_trigger(&matches),
+        "merge" => merge_trigger(&matches),
         "ac" => ac_trigger(&matches),
         _ => help()
     } 
