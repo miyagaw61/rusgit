@@ -357,6 +357,21 @@ fn rebase(branch_name: &str) {
     ].join(" ").as_str());
 }
 
+fn alias() {
+    println!("\
+alias rs=\"rusgit status\"
+alias ra=\"rusgit add\"
+alias rc=\"rusgit commit\"
+alias rac=\"rusgit ac\"
+alias rl=\"rusgit log\"
+alias rd=\"rusgit diff\"
+alias rb=\"rusgit branch\"
+alias rpush=\"rusgit push\"
+alias rpull=\"rusgit pull\"\
+");
+}
+
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -481,6 +496,9 @@ fn main() {
                          .required(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("alias")
+                    .about("set aliases")
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -497,6 +515,7 @@ fn main() {
         "merge" => merge_trigger(&matches),
         "rebase" => rebase_trigger(&matches),
         "ac" => ac_trigger(&matches),
+        "alias" => alias(),
         _ => help()
     } 
 }
