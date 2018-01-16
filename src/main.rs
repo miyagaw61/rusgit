@@ -110,7 +110,7 @@ fn commit(message: &str) {
     if message == "" {
         process("git commit 1> /dev/null");
     } else {
-        process(["git commit -m", message, "1> /dev/null"].join(" ").as_str());
+        process(["git commit -m \"", message, "\" 1> /dev/null"].join(" ").as_str());
     }
 }
 
@@ -118,7 +118,9 @@ fn commit_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("commit").unwrap().is_present("amend") {
         process("git commit --amend");
     } else if matches.subcommand_matches("commit").unwrap().is_present("message") {
-        commit(matches.subcommand_matches("commit").unwrap().value_of("message").unwrap());
+        let message: Vec<&str> = matches.subcommand_matches("commit").unwrap().values_of("message").unwrap().collect();
+        let message: String = message.join(" ");
+        commit(&message);
         process("git log --decorate=short --oneline -1 --color");
     } else {
         commit("");
@@ -373,6 +375,7 @@ fn main() {
                     .about("improved git-commit")
                     .arg(Arg::with_name("message")
                          .help("commit message")
+                         .multiple(true)
                          )
                     .arg(Arg::with_name("amend")
                          .help("git commit --amend")
