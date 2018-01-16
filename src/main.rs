@@ -282,7 +282,10 @@ fn branch(branch_name: &str) -> String {
         return "".to_string()
     }
     let before = before.as_str().red().bold().to_string();
-    process(["git checkout", branch_name, "1> /dev/null 2> /dev/null"].join(" ").as_str());
+    let result = system(["git checkout", branch_name, "1> /dev/null"].join(" ").as_str());
+    if result.stderr != "" {
+        std::process::exit(0);
+    }
     let arrow = " -> ".yellow().bold().to_string();
     println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
     "".to_string()
