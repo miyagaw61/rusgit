@@ -497,7 +497,7 @@ fn main() {
                          )
                     )
         .subcommand(SubCommand::with_name("alias")
-                    .about("set aliases")
+                    .about("print aliases")
                     )
         .get_matches();
 
