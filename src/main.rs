@@ -216,18 +216,18 @@ fn push(branch_name: &str) {
 }
 
 fn push_trigger(matches: &clap::ArgMatches) {
-    if matches.subcommand_matches("push").unwrap().is_present("branch") {
-        let branch_name: &str = matches.subcommand_matches("push").unwrap().value_of("branch").unwrap();
-        println!("{}", ["[+]PUSH: ", branch_name].join("").as_str().red().bold().to_string());
-        print!("{}", "=========".yellow().bold().to_string());
-        for _ in branch_name.chars() {
-            print!("{}", "=".yellow().bold().to_string());
-        }
-        println!("");
-        push(branch_name);
+    let branch_name: String = if matches.subcommand_matches("push").unwrap().is_present("branch") {
+        matches.subcommand_matches("push").unwrap().value_of("branch").unwrap().to_string()
     } else {
-        push("");
+        branch("")
+    };
+    println!("{}", ["[+]PUSH: ", branch_name.as_str()].join("").as_str().red().bold().to_string());
+    print!("{}", "=========".yellow().bold().to_string());
+    for _ in branch_name.chars() {
+        print!("{}", "=".yellow().bold().to_string());
     }
+    println!("");
+    push(&branch_name);
 }
 
 fn get_branches() -> Vec<String> {
