@@ -440,6 +440,13 @@ fn merge(branch_name: &str) {
 }
 
 fn rebase_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("rebase").unwrap().is_present("i") {
+        process([
+                "git rebase -i ",
+                matches.subcommand_matches("rebase").unwrap().value_of("i").unwrap()
+        ].join("").as_str());
+        std::process::exit(0);
+    }
     let branch_name = matches.subcommand_matches("rebase").unwrap().value_of("branch").unwrap();
     rebase(branch_name);
 }
@@ -748,7 +755,13 @@ fn main() {
                     .about("improved git-rebase")
                     .arg(Arg::with_name("branch")
                          .help("branch name")
-                         .required(true)
+                         .required_unless("i")
+                         )
+                    .arg(Arg::with_name("i")
+                         .help("rebase -i")
+                         .short("i")
+                         .takes_value(true)
+                         .value_name("commit-id")
                          )
                     )
         .subcommand(SubCommand::with_name("alias")
