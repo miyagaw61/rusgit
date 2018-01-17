@@ -204,10 +204,10 @@ fn diff_hash(hash: &str) {
 
 fn diff_cached(file: &str) {
     process([
-            "git diff",
+            "git diff ",
+            "--cached ",
             file,
-            "--cached"
-    ].join(" ").as_str());
+    ].join("").as_str());
 }
 
 fn diff_trigger(matches: &clap::ArgMatches) {
