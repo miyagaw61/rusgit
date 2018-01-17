@@ -26,16 +26,20 @@ cargo install --git https://github.com/miyagaw61/rusgit
 
 
 ```Bash
-#alias rusgit
-alias rs="rusgit status"
+alias rs="rusgit status --ls 'ls --color=always'"
 alias ra="rusgit add"
 alias rc="rusgit commit"
 alias rac="rusgit ac"
 alias rl="rusgit log"
 alias rd="rusgit diff"
 alias rb="rusgit branch"
+alias ru="rusgit undo"
+alias rt="rusgit tag"
 alias rpush="rusgit push"
 alias rpull="rusgit pull"
+alias rmerge="rusgit merge"
+alias rrebase="rusgit rebase"
+alias rclone="rusgit clone"
 ```
 
 If it is the same alias as above, you can also set it with the following command.

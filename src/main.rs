@@ -422,7 +422,7 @@ fn rebase(branch_name: &str) {
 
 fn alias() {
     println!("\
-alias rs=\"rusgit status\"
+alias rs=\"rusgit status --ls 'ls --color=always'\"
 alias ra=\"rusgit add\"
 alias rc=\"rusgit commit\"
 alias rac=\"rusgit ac\"
