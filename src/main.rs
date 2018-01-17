@@ -634,7 +634,7 @@ fn tag_trigger(matches: &clap::ArgMatches) {
 
 fn main() {
     let matches = App::new("rusgit")
-        .version("0.1.0")
+        .version("1.0.0")
         .author("miyagaw61 <miyagaw61@gmail.com>")
         .about("Git Wrapper in Rust")
         .subcommand(SubCommand::with_name("status")
