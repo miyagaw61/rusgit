@@ -533,6 +533,51 @@ fn undo(matches: &clap::ArgMatches) {
     }
 }
 
+fn tag_trigger(matches: &clap::ArgMatches) {
+    let tag_name = matches.subcommand_matches("tag").unwrap().value_of("tag-name").unwrap_or("");
+    if matches.subcommand_matches("tag").unwrap().is_present("show") {
+        process([
+                "git show ",
+                tag_name
+        ].join("").as_str());
+    } else if tag_name == "" {
+        process("git tag");
+        std::process::exit(0);
+    } else if matches.subcommand_matches("tag").unwrap().is_present("message") {
+        let message: Vec<&str> = matches.subcommand_matches("tag").unwrap().values_of("message").unwrap().collect();
+        let message: String = message.join(" ");
+        process([
+                "git tag -a ",
+                tag_name,
+                " -m \"",
+                &message,
+                "\""
+        ].join("").as_str());
+        process([
+                "git push origin ",
+                tag_name
+        ].join("").as_str());
+    } else if matches.subcommand_matches("tag").unwrap().is_present("delete") {
+        process([
+                "git tag -d ",
+                tag_name
+        ].join("").as_str());
+        process([
+                "git push --delete origin ",
+                tag_name
+        ].join("").as_str());
+    } else {
+        process([
+                "git tag ",
+                tag_name
+        ].join("").as_str());
+        process([
+                "git push origin ",
+                tag_name
+        ].join("").as_str());
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("0.1.0")
@@ -702,6 +747,32 @@ fn main() {
                                      )
                                 )
                     )
+        .subcommand(SubCommand::with_name("tag")
+                    .about("improved git-tag")
+                    .arg(Arg::with_name("message")
+                         .help("messaging tag")
+                         .short("m")
+                         .long("message")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("delete")
+                         .help("delete tag")
+                         .short("d")
+                         .long("delete")
+                         )
+                    .arg(Arg::with_name("show")
+                         .help("git show")
+                         .short("s")
+                         .long("show")
+                         .value_name("tag-name")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("tag-name")
+                         .help("tag name")
+                         .takes_value(true)
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -721,6 +792,7 @@ fn main() {
         "alias" => alias(),
         "clone" => clone(&matches),
         "undo" => undo(&matches),
+        "tag" => tag_trigger(&matches),
         _ => help()
     } 
 }
