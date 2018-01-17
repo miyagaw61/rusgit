@@ -331,8 +331,39 @@ fn branch(branch_name: &str) -> String {
     "".to_string()
 }
 
+fn branch_pull(branch_name: &str, remote_branch_name: &str) {
+    let before = system("git symbolic-ref --short HEAD 2> /dev/null").stdout;
+    let before = before.as_str().red().bold().to_string();
+    let branches = get_branches();
+    let result = if ! branches.contains(&branch_name.to_string()) {
+        system_allow_stderr(["git checkout -b ", branch_name, " origin/", remote_branch_name, " 1> /dev/null"].join("").as_str())
+    } else {
+        println!("Already exists: {}", branch_name);
+        std::process::exit(0);
+    };
+    if result.stderr != "" {
+        let stderr: Vec<&str> = result.stderr.split("\n").collect();
+        let stderr_count = stderr.iter().count();
+        if !(stderr_count == 1 && stderr[0].contains("Switched")) {
+            println!("{}", "[+]ERROR:".red().bold().to_string());
+            println!("{}", "=========".yellow().bold().to_string());
+            println!("{}", result.stderr.red().bold().to_string());
+            std::process::exit(0);
+        }
+    }
+    if ! branches.contains(&branch_name.to_string()) {
+        println!("{}", ["Created branch:", branch_name].join(" "));
+    }
+    let arrow = " -> ".yellow().bold().to_string();
+    println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
+}
+
 fn branch_trigger(matches: &clap::ArgMatches) {
-    if matches.subcommand_matches("branch").unwrap().is_present("branch") {
+    if matches.subcommand_matches("branch").unwrap().is_present("remote-branch") {
+        let branch_name = matches.subcommand_matches("branch").unwrap().value_of("branch").unwrap();
+        let remote_branch_name = matches.subcommand_matches("branch").unwrap().value_of("remote-branch").unwrap();
+        branch_pull(branch_name, remote_branch_name);
+    } else if matches.subcommand_matches("branch").unwrap().is_present("branch") {
         let branch_name = matches.subcommand_matches("branch").unwrap().value_of("branch").unwrap();
         branch(branch_name);
     } else if matches.subcommand_matches("branch").unwrap().is_present("delete") {
@@ -691,6 +722,11 @@ fn main() {
                     .about("improved git-branch")
                     .arg(Arg::with_name("branch")
                          .help("branch name")
+                         .index(1)
+                         )
+                    .arg(Arg::with_name("remote-branch")
+                         .help("remote branch name")
+                         .index(2)
                          )
                     .arg(Arg::with_name("delete")
                          .help("delete branch")
