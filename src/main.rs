@@ -275,14 +275,13 @@ fn branch(branch_name: &str) -> String {
     if branch_name == "" {
         return before
     }
-    let branches = get_branches();
-    if ! branches.contains(&branch_name.to_string()) {
-        process(["git branch", branch_name].join(" ").as_str());
-        println!("{}", ["Created branch", branch_name].join(" "));
-        return "".to_string()
-    }
     let before = before.as_str().red().bold().to_string();
-    let result = system_allow_stderr(["git checkout", branch_name, "1> /dev/null"].join(" ").as_str());
+    let branches = get_branches();
+    let result = if ! branches.contains(&branch_name.to_string()) {
+        system_allow_stderr(["git checkout -b", branch_name, "1> /dev/null"].join(" ").as_str())
+    } else {
+        system_allow_stderr(["git checkout", branch_name, "1> /dev/null"].join(" ").as_str())
+    };
     if result.stderr != "" {
         let stderr: Vec<&str> = result.stderr.split("\n").collect();
         let stderr_count = stderr.iter().count();
@@ -292,6 +291,9 @@ fn branch(branch_name: &str) -> String {
             println!("{}", result.stderr.red().bold().to_string());
             std::process::exit(0);
         }
+    }
+    if ! branches.contains(&branch_name.to_string()) {
+        println!("{}", ["Created branch:", branch_name].join(" "));
     }
     let arrow = " -> ".yellow().bold().to_string();
     println!("{}{}{}", before, arrow, branch_name.red().bold().to_string());
@@ -407,6 +409,115 @@ fn clone(matches: &clap::ArgMatches) {
             "https://github.com/",
             matches.subcommand_matches("clone").unwrap().value_of("repo").unwrap()
     ].join("").as_str());
+}
+
+fn undo(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("undo").unwrap().is_present("commit") {
+        if matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().is_present("commit id") {
+            let commit_id: &str = matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().value_of("commit id").unwrap();
+            let msg = [
+                      "undo changes until ",
+                      commit_id
+            ].join("");
+            let chars = msg.chars();
+            let msg = msg.red().bold().to_string();
+            println!("{}", msg);
+            for _ in chars {
+                print!("{}", "=".yellow().bold().to_string());
+            }
+            println!("");
+            let result = system_allow_stderr(["git checkout ",
+                    commit_id
+            ].join("").as_str());
+            for (i, x) in result.stderr.split("\n").enumerate() {
+                if i == 0 && x.contains("Note: checking out") {
+                    continue;
+                } else if i == 1 && x == "" { 
+                    continue;
+                } else if i == 2 && x.contains("state. You can look around, make experimental") {
+                    continue;
+                } else if i == 3 && x.contains("changes and commit them, and you can discard any commits you make in this") {
+                    continue;
+                } else if i == 4 && x.contains("state without impacting any branches by performing another checkout.") {
+                    continue;
+                } else if i == 5 && x.contains("") {
+                    continue;
+                } else if i == 6 && x.contains("If you want to create a new branch to retain commits you create, you may") {
+                    continue;
+                } else if i == 7 && x.contains("by using -b with the checkout command again. Example:") {
+                    continue;
+                } else if i == 8 && x.contains("") {
+                    continue;
+                } else if i == 9 && x.contains("git checkout -b") {
+                    continue;
+                } else if i == 10 && x.contains("") {
+                    continue;
+                } else if i == 11 && x.contains("HEAD is now at") {
+                    continue;
+                } else if i < 12 {
+                    println!("{}", result.stderr);
+                    std::process::exit(0);
+                }
+            }
+            println!("Success.");
+            println!("Next.. Please create new branch.");
+            println!("\ntry:");
+            println!("  rusgit branch <new-branch>");
+        } else if matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().is_present("hard") {
+            let msg = "undo commit(not keep changes)";
+            let chars = msg.chars();
+            let msg = msg.red().bold().to_string();
+            println!("{}", msg);
+            for _ in chars {
+                print!("{}", "=".yellow().bold().to_string());
+            }
+            println!("");
+            process("git reset --hard HEAD^");
+        } else {
+            let msg = "undo commit(keep changes)";
+            let chars = msg.chars();
+            let msg = msg.red().bold().to_string();
+            println!("{}", msg);
+            for _ in chars {
+                print!("{}", "=".yellow().bold().to_string());
+            }
+            println!("");
+            process("git reset --soft HEAD^");
+        }
+    } else if matches.subcommand_matches("undo").unwrap().is_present("add") {
+        let file_name: &str = matches.subcommand_matches("undo").unwrap().subcommand_matches("add").unwrap().value_of("file").unwrap_or("");
+        let msg = [
+                  "undo stage: ",
+                  file_name
+        ].join("");
+        let chars = msg.chars();
+        let msg = msg.red().bold().to_string();
+        println!("{}", msg);
+        for _ in chars {
+            print!("{}", "=".yellow().bold().to_string());
+        }
+        println!("");
+        process([
+                "git reset HEAD ",
+                file_name
+        ].join("").as_str());
+    } else if matches.subcommand_matches("undo").unwrap().is_present("head") {
+        let file_name: &str = matches.subcommand_matches("undo").unwrap().subcommand_matches("head").unwrap().value_of("file").unwrap();
+        let msg = [
+                  "undo changes: ",
+                  file_name
+        ].join("");
+        let chars = msg.chars();
+        let msg = msg.red().bold().to_string();
+        println!("{}", msg);
+        for _ in chars {
+            print!("{}", "=".yellow().bold().to_string());
+        }
+        println!("");
+        process(["git checkout HEAD ",
+                file_name
+        ].join("").as_str());
+    }
 }
 
 fn main() {
@@ -543,6 +654,36 @@ fn main() {
                          .required(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("undo")
+                    .about("undo actions")
+                    .subcommand(SubCommand::with_name("commit")
+                                .about("undo commit(keep changes)")
+                                .arg(Arg::with_name("hard")
+                                     .help("undo commit(not keep changes)")
+                                     .long("hard")
+                                     )
+                                .arg(Arg::with_name("commit id")
+                                     .help("undo change until <commit id>")
+                                     .long("id")
+                                     .takes_value(true)
+                                     )
+                                )
+                    .subcommand(SubCommand::with_name("add")
+                                .about("undo adding stage")
+                                .arg(Arg::with_name("file")
+                                     .help("file name")
+                                     .takes_value(true)
+                                     )
+                                )
+                    .subcommand(SubCommand::with_name("head")
+                                .about("undo changes")
+                                .arg(Arg::with_name("file")
+                                     .help("file name")
+                                     .takes_value(true)
+                                     .required(true)
+                                     )
+                                )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -561,6 +702,7 @@ fn main() {
         "ac" => ac_trigger(&matches),
         "alias" => alias(),
         "clone" => clone(&matches),
+        "undo" => undo(&matches),
         _ => help()
     } 
 }
