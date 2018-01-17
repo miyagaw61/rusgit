@@ -75,8 +75,8 @@ fn process(command: &str) -> std::process::ExitStatus {
 //    Regex::new(re).unwrap()
 //}
 
-fn status(mode: &str) {
-    process("ls --color=always");
+fn status_with_ls(mode: &str, ls: &str) {
+    process(&ls);
     let status = system_allow_stderr("git status --short").stdout;
     if status.chars().count() == 0 { std::process::exit(0); }
     println!("{}", "\n[+]GIT_STATUS".red().bold().to_string());
@@ -88,11 +88,29 @@ fn status(mode: &str) {
     }
 }
 
-fn status_trigger(matches: &clap::ArgMatches){
-    if matches.subcommand_matches("status").unwrap().is_present("verbose") {
-        status("verbose");
+fn status(mode: &str) {
+    let status = system_allow_stderr("git status --short").stdout;
+    if status.chars().count() == 0 { std::process::exit(0); }
+    if mode == "verbose" {
+        process("git status");
     } else {
-        status("");
+        process("git status --short 2> /dev/null");
+    }
+}
+
+fn status_trigger(matches: &clap::ArgMatches){
+    if matches.subcommand_matches("status").unwrap().is_present("ls") {
+        if matches.subcommand_matches("status").unwrap().is_present("verbose") {
+            status_with_ls("verbose", matches.subcommand_matches("status").unwrap().value_of("ls").unwrap());
+        } else {
+            status_with_ls("", matches.subcommand_matches("status").unwrap().value_of("ls").unwrap());
+        }
+    } else {
+        if matches.subcommand_matches("status").unwrap().is_present("verbose") {
+            status("verbose");
+        } else {
+            status("");
+        }
     }
 }
 
@@ -594,6 +612,11 @@ fn main() {
                          .help("verbose status")
                          .short("v")
                          .long("verbose")
+                         )
+                    .arg(Arg::with_name("ls")
+                         .help("status with ls command")
+                         .long("ls")
+                         .takes_value(true)
                          )
                     )
         .subcommand(SubCommand::with_name("add")
