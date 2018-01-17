@@ -318,7 +318,7 @@ fn branch(branch_name: &str) -> String {
         let stderr_count = stderr.iter().count();
         if !(stderr_count == 1 && stderr[0].contains("Switched")) {
             println!("{}", "[+]ERROR:".red().bold().to_string());
-            println!("{}", "========:".yellow().bold().to_string());
+            println!("{}", "=========".yellow().bold().to_string());
             println!("{}", result.stderr.red().bold().to_string());
             std::process::exit(0);
         }
