@@ -26,7 +26,7 @@ cargo install --git https://github.com/miyagaw61/rusgit
 
 
 ```Bash
-alias rs="rusgit status --ls 'ls --color=always'"
+alias rs="rusgit status"
 alias ra="rusgit add"
 alias rc="rusgit commit"
 alias rac="rusgit ac"
