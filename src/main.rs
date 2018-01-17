@@ -119,6 +119,10 @@ fn add(files: Vec<&str>) {
 }
 
 fn add_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("add").unwrap().is_present("p") {
+        process("git add -p");
+        std::process::exit(0);
+    }
     let files: Vec<&str> = matches.subcommand_matches("add").unwrap().values_of("files").unwrap().collect();
     add(files);
     status("");
@@ -641,8 +645,12 @@ fn main() {
                     .about("improved git-add")
                     .arg(Arg::with_name("files")
                          .help("victim files")
-                         .required(true)
+                         .required_unless("p")
                          .multiple(true)
+                         )
+                    .arg(Arg::with_name("p")
+                         .help("git add -p")
+                         .short("p")
                          )
                     )
         .subcommand(SubCommand::with_name("commit")
