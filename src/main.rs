@@ -128,7 +128,7 @@ fn commit(message: &str) {
     if message == "" {
         process("git commit 1> /dev/null");
     } else {
-        process(["git commit -m \"", message, "\" 1> /dev/null"].join(" ").as_str());
+        process(["git commit -m \"", message, "\" 1> /dev/null"].join("").as_str());
     }
 }
 
