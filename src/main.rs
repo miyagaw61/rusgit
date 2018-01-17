@@ -411,8 +411,13 @@ alias rac=\"rusgit ac\"
 alias rl=\"rusgit log\"
 alias rd=\"rusgit diff\"
 alias rb=\"rusgit branch\"
+alias ru=\"rusgit undo\"
+alias rt=\"rusgit tag\"
 alias rpush=\"rusgit push\"
-alias rpull=\"rusgit pull\"\
+alias rpull=\"rusgit pull\"
+alias rmerge=\"rusgit merge\"
+alias rrebase=\"rusgit rebase\"
+alias rclone=\"rusgit clone\"\
 ");
 }
 
