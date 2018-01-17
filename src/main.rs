@@ -479,7 +479,13 @@ fn clone(matches: &clap::ArgMatches) {
 }
 
 fn undo(matches: &clap::ArgMatches) {
-    if matches.subcommand_matches("undo").unwrap().is_present("commit") {
+    if matches.subcommand_matches("undo").unwrap().is_present("orig") {
+        if matches.subcommand_matches("undo").unwrap().subcommand_matches("orig").unwrap().is_present("hard") {
+            process("git reset --hard ORIG_HEAD");
+        } else {
+            process("git reset --soft ORIG_HEAD");
+        }
+    } else if matches.subcommand_matches("undo").unwrap().is_present("commit") {
         if matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().is_present("commit id") {
             let commit_id: &str = matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().value_of("commit id").unwrap();
             let msg = [
@@ -782,6 +788,13 @@ fn main() {
                                      .help("file name")
                                      .takes_value(true)
                                      .required(true)
+                                     )
+                                )
+                    .subcommand(SubCommand::with_name("orig")
+                                .about("go to ORIG_HEAD")
+                                .arg(Arg::with_name("hard")
+                                     .help("not keep changes")
+                                     .long("head")
                                      )
                                 )
                     )
