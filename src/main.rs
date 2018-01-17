@@ -128,25 +128,38 @@ fn commit_trigger(matches: &clap::ArgMatches) {
     }
 }
 
-fn log(num: i32) {
-    process(["git log --decorate=short --oneline -", num.to_string().as_str()].join("").as_str());
+fn log(num: i32, verbose: &str) {
+    if verbose == "verbose" {
+        process(["git log --decorate=short -p -", num.to_string().as_str()].join("").as_str());
+    } else {
+        process(["git log --decorate=short --oneline -", num.to_string().as_str()].join("").as_str());
+    }
 }
-fn log_graph(num: i32) {
-    process(["git log --decorate=short --graph --oneline -", num.to_string().as_str()].join("").as_str());
+fn log_graph(num: i32, verbose: &str) {
+    if verbose == "verbose" {
+        process(["git log --decorate=short --graph -p -", num.to_string().as_str()].join("").as_str());
+    } else {
+        process(["git log --decorate=short --graph --oneline -", num.to_string().as_str()].join("").as_str());
+    }
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
+    let verbose = if matches.subcommand_matches("log").unwrap().is_present("verbose") {
+        "verbose"
+    } else {
+        ""
+    };
     if matches.subcommand_matches("log").unwrap().is_present("num") {
         if matches.subcommand_matches("log").unwrap().is_present("graph") {
-            log_graph(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
+            log_graph(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), verbose);
         } else {
-            log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap());
+            log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), verbose);
         }
     } else {
         if matches.subcommand_matches("log").unwrap().is_present("graph") {
-            log_graph(3);
+            log_graph(3, verbose);
         } else {
-            log(3);
+            log(3, verbose);
         }
     }
 }
@@ -562,6 +575,11 @@ fn main() {
                          .help("graph mode")
                          .short("g")
                          .long("graph")
+                         )
+                    .arg(Arg::with_name("verbose")
+                         .help("verbose mode")
+                         .short("v")
+                         .long("verbose")
                          )
                     )
         .subcommand(SubCommand::with_name("diff")
