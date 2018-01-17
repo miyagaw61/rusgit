@@ -493,43 +493,17 @@ fn undo(matches: &clap::ArgMatches) {
                 print!("{}", "=".yellow().bold().to_string());
             }
             println!("");
-            let result = system_allow_stderr(["git checkout ",
-                    commit_id
-            ].join("").as_str());
-            for (i, x) in result.stderr.split("\n").enumerate() {
-                if i == 0 && x.contains("Note: checking out") {
-                    continue;
-                } else if i == 1 && x == "" { 
-                    continue;
-                } else if i == 2 && x.contains("state. You can look around, make experimental") {
-                    continue;
-                } else if i == 3 && x.contains("changes and commit them, and you can discard any commits you make in this") {
-                    continue;
-                } else if i == 4 && x.contains("state without impacting any branches by performing another checkout.") {
-                    continue;
-                } else if i == 5 && x.contains("") {
-                    continue;
-                } else if i == 6 && x.contains("If you want to create a new branch to retain commits you create, you may") {
-                    continue;
-                } else if i == 7 && x.contains("by using -b with the checkout command again. Example:") {
-                    continue;
-                } else if i == 8 && x.contains("") {
-                    continue;
-                } else if i == 9 && x.contains("git checkout -b") {
-                    continue;
-                } else if i == 10 && x.contains("") {
-                    continue;
-                } else if i == 11 && x.contains("HEAD is now at") {
-                    continue;
-                } else if i < 12 {
-                    println!("{}", result.stderr);
-                    std::process::exit(0);
-                }
+            if matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().is_present("hard") {
+                process([
+                        "git reset --hard ",
+                        commit_id
+                ].join("").as_str());
+            } else {
+                process([
+                        "git reset --soft ",
+                        commit_id
+                ].join("").as_str());
             }
-            println!("Success.");
-            println!("Next.. Please create new branch.");
-            println!("\ntry:");
-            println!("  rusgit branch <new-branch>");
         } else if matches.subcommand_matches("undo").unwrap().subcommand_matches("commit").unwrap().is_present("hard") {
             let msg = "undo commit(not keep changes)";
             let chars = msg.chars();
