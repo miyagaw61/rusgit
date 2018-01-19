@@ -818,7 +818,7 @@ fn main() {
                                 .about("go to ORIG_HEAD")
                                 .arg(Arg::with_name("hard")
                                      .help("not keep changes")
-                                     .long("head")
+                                     .long("hard")
                                      )
                                 )
                     )
