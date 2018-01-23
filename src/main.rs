@@ -169,8 +169,16 @@ fn log(num: i32, options: Vec<&str>) {
 
 fn log_trigger(matches: &clap::ArgMatches) {
     if matches.subcommand_matches("log").unwrap().is_present("ref") {
-        reflog(matches.subcommand_matches("log").unwrap().is_present("all"));
-        std::process::exit(0);
+        match matches.subcommand_matches("log").unwrap().value_of("0").unwrap_or("") {
+            "" => {
+                reflog(branch("").as_str(), matches.subcommand_matches("log").unwrap().is_present("all"));
+                std::process::exit(0);
+            },
+            branch_name => {
+                reflog(branch_name, matches.subcommand_matches("log").unwrap().is_present("all"));
+                std::process::exit(0);
+            }
+        }
     }
     let mut options: Vec<&str> = Vec::new();
     match matches.subcommand_matches("log").unwrap().is_present("graph") {
@@ -181,10 +189,10 @@ fn log_trigger(matches: &clap::ArgMatches) {
         true => options.push("-p"),
         false => options.push("--oneline")
     }
-    if matches.subcommand_matches("log").unwrap().is_present("num") {
+    if matches.subcommand_matches("log").unwrap().is_present("0") {
         match matches.subcommand_matches("log").unwrap().is_present("all") {
             true => log(-1, options),
-            false => log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), options)
+            false => log(matches.subcommand_matches("log").unwrap().value_of("0").unwrap().parse().unwrap(), options)
         }
     } else {
         match matches.subcommand_matches("log").unwrap().is_present("all") {
@@ -631,13 +639,18 @@ fn tag_trigger(matches: &clap::ArgMatches) {
     }
 }
 
-fn reflog(all: bool) {
+fn reflog(branch_name: &str, all: bool) {
     if all {
         process("git reflog");
-    } else {
+    } else if branch_name == "" {
         process([
                 "git reflog ",
                 branch("").as_str()
+        ].join("").as_str());
+    } else {
+        process([
+                "git reflog ",
+                branch_name
         ].join("").as_str());
     }
 }
@@ -686,8 +699,29 @@ fn main() {
                     )
         .subcommand(SubCommand::with_name("log")
                     .about("improved git-log")
-                    .arg(Arg::with_name("num")
+                    .help("\
+rusgit-log
+improved git-log
+
+USAGE:
+    rusgit log [FLAGS] [OPTIONS] [num]
+
+FLAGS:
+    -a, --all        show all
+    -g, --graph      graph mode
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    -v, --verbose    verbose mode
+
+OPTIONS:
+    -r, --ref [branch]    reflog
+
+ARGS:
+    <num>    num of logs [default: 3]\
+")
+                    .arg(Arg::with_name("0")
                          .help("num of logs")
+                         .value_name("num")
                          )
                     .arg(Arg::with_name("graph")
                          .help("graph mode")
