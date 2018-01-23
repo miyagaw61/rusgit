@@ -157,7 +157,14 @@ fn log(num: i32, options: Vec<&str>) {
         cmd.push_str(x);
     }
     cmd.push_str(" -");
-    process([&cmd, num.to_string().as_str()].join("").as_str());
+    match num {
+        -1 => {
+            process([&cmd, "-all"].join("").as_str());
+        },
+        _ => {
+            process([&cmd, num.to_string().as_str()].join("").as_str());
+        }
+    }
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
@@ -174,14 +181,16 @@ fn log_trigger(matches: &clap::ArgMatches) {
         true => options.push("-p"),
         false => options.push("--oneline")
     }
-    match matches.subcommand_matches("log").unwrap().is_present("all") {
-        true => options.push("--all"),
-        false => print!("")
-    }
     if matches.subcommand_matches("log").unwrap().is_present("num") {
-        log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), options);
+        match matches.subcommand_matches("log").unwrap().is_present("all") {
+            true => log(-1, options),
+            false => log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), options)
+        }
     } else {
-        log(3, options);
+        match matches.subcommand_matches("log").unwrap().is_present("all") {
+            true => log(-1, options),
+            false => log(3, options)
+        }
     }
 }
 
@@ -695,11 +704,11 @@ fn main() {
                          .short("r")
                          .long("ref")
                          )
-                    //.arg(Arg::with_name("all")
-                    //     .help("show all")
-                    //     .short("a")
-                    //     .long("all")
-                    //     )
+                    .arg(Arg::with_name("all")
+                         .help("show all")
+                         .short("a")
+                         .long("all")
+                         )
                     )
         .subcommand(SubCommand::with_name("diff")
                     .about("improved git-diff")
