@@ -150,19 +150,14 @@ fn commit_trigger(matches: &clap::ArgMatches) {
     }
 }
 
-fn log(num: i32, verbose: &str) {
-    if verbose == "verbose" {
-        process(["git log --decorate=short -p -", num.to_string().as_str()].join("").as_str());
-    } else {
-        process(["git log --decorate=short --oneline -", num.to_string().as_str()].join("").as_str());
+fn log(num: i32, options: Vec<&str>) {
+    let mut cmd = "git log --decorate=short".to_string();
+    for x in options {
+        cmd.push(' ');
+        cmd.push_str(x);
     }
-}
-fn log_graph(num: i32, verbose: &str) {
-    if verbose == "verbose" {
-        process(["git log --decorate=short --graph -p -", num.to_string().as_str()].join("").as_str());
-    } else {
-        process(["git log --decorate=short --graph --oneline -", num.to_string().as_str()].join("").as_str());
-    }
+    cmd.push_str(" -");
+    process([&cmd, num.to_string().as_str()].join("").as_str());
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
@@ -170,23 +165,23 @@ fn log_trigger(matches: &clap::ArgMatches) {
         reflog(matches.subcommand_matches("log").unwrap().is_present("all"));
         std::process::exit(0);
     }
-    let verbose = if matches.subcommand_matches("log").unwrap().is_present("verbose") {
-        "verbose"
-    } else {
-        ""
-    };
+    let mut options: Vec<&str> = Vec::new();
+    match matches.subcommand_matches("log").unwrap().is_present("graph") {
+        true => options.push("--graph"),
+        false => print!("")
+    }
+    match matches.subcommand_matches("log").unwrap().is_present("verbose") {
+        true => options.push("-p"),
+        false => options.push("--oneline")
+    }
+    match matches.subcommand_matches("log").unwrap().is_present("all") {
+        true => options.push("--all"),
+        false => print!("")
+    }
     if matches.subcommand_matches("log").unwrap().is_present("num") {
-        if matches.subcommand_matches("log").unwrap().is_present("graph") {
-            log_graph(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), verbose);
-        } else {
-            log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), verbose);
-        }
+        log(matches.subcommand_matches("log").unwrap().value_of("num").unwrap().parse().unwrap(), options);
     } else {
-        if matches.subcommand_matches("log").unwrap().is_present("graph") {
-            log_graph(3, verbose);
-        } else {
-            log(3, verbose);
-        }
+        log(3, options);
     }
 }
 
