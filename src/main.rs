@@ -166,6 +166,10 @@ fn log_graph(num: i32, verbose: &str) {
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
+    if matches.subcommand_matches("log").unwrap().is_present("ref") {
+        reflog(matches.subcommand_matches("log").unwrap().is_present("all"));
+        std::process::exit(0);
+    }
     let verbose = if matches.subcommand_matches("log").unwrap().is_present("verbose") {
         "verbose"
     } else {
@@ -623,6 +627,17 @@ fn tag_trigger(matches: &clap::ArgMatches) {
     }
 }
 
+fn reflog(all: bool) {
+    if all {
+        process("git reflog");
+    } else {
+        process([
+                "git reflog ",
+                branch("").as_str()
+        ].join("").as_str());
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("1.0.0")
@@ -680,6 +695,16 @@ fn main() {
                          .short("v")
                          .long("verbose")
                          )
+                    .arg(Arg::with_name("ref")
+                         .help("improved git-reflog")
+                         .short("r")
+                         .long("ref")
+                         )
+                    //.arg(Arg::with_name("all")
+                    //     .help("show all")
+                    //     .short("a")
+                    //     .long("all")
+                    //     )
                     )
         .subcommand(SubCommand::with_name("diff")
                     .about("improved git-diff")
