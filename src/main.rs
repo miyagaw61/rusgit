@@ -158,13 +158,9 @@ fn log(num: i32, options: Vec<&str>) {
     }
     cmd.push_str(" -");
     match num {
-        -1 => {
-            process([&cmd, "-all"].join("").as_str());
-        },
-        _ => {
-            process([&cmd, num.to_string().as_str()].join("").as_str());
-        }
-    }
+        -1 => process([&cmd, "-all"].join("").as_str()),
+        _ => process([&cmd, num.to_string().as_str()].join("").as_str())
+    };
 }
 
 fn log_trigger(matches: &clap::ArgMatches) {
