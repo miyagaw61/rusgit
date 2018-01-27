@@ -2,6 +2,8 @@ extern crate clap;
 extern crate colored;
 extern crate regex;
 
+use std::fs::OpenOptions;
+use std::io::Read;
 use clap::{App, Arg, SubCommand};
 use std::process::Command;
 use colored::*;
@@ -79,7 +81,7 @@ fn status_with_ls(mode: &str, ls: &str) {
     process(&ls);
     let status = system_allow_stderr("git status --short").stdout;
     if status.chars().count() == 0 { std::process::exit(0); }
-    println!("{}", "\n[+]GIT_STATUS".red().bold().to_string());
+    println!("{}", "\n[+]GIT-STATUS".red().bold().to_string());
     println!("{}", "=============".yellow().bold().to_string());
     if mode == "verbose" {
         process("git status");
@@ -129,11 +131,53 @@ fn add_trigger(matches: &clap::ArgMatches) {
 }
 
 fn commit(message: &str) {
-    if message == "" {
-        process("git commit 1> /dev/null");
-    } else {
-        process(["git commit -m \"", message, "\" 1> /dev/null"].join("").as_str());
-    }
+    let mut message_string = String::new();
+    match message {
+        "" => {
+            let editor = std::env::var("RUSGIT_EDITOR").unwrap_or("".to_string());
+            let editor = match &editor[..] {
+                "" => std::env::var("EDITOR").unwrap_or("".to_string()),
+                n => n.to_string()
+            };
+            process("rm -rf /tmp/rusgit_commit.tmp");
+            if editor != "" {
+                let cmd = [&editor,
+                        " /tmp/rusgit_commit.tmp"
+                ].join("");
+                process(&cmd);
+            } else {
+                process("vim /tmp/rusgit_commit.tmp");
+            }
+            let mut f = match OpenOptions::new().read(true).write(true).open("/tmp/rusgit_commit.tmp") {
+                Ok(f) => f,
+                Err(_) => {
+                    std::fs::File::create("/tmp/rusgit_commit.tmp").unwrap();
+                    OpenOptions::new().read(true).write(true).open("/tmp/rusgit_commit.tmp").unwrap()
+                }
+            };
+            f.read_to_string(&mut message_string).expect("can not read file");
+        },
+        _ => message_string = message.to_string()
+    };
+    let prefix = match &message_string[0..2] {
+        "i " => "Improve ",
+        "I " => "Implement ",
+        "r " => "Remove ",
+        "R " => "Refactor ",
+        "u " => "Use ",
+        "U " => "Update ",
+        "a " => "Add ",
+        "c " => "Change ",
+        "f " => "Fix ",
+        "s " => "Support ",
+        "l " => "Allow ",
+        "v " => "Avoid ",
+        _ => ""
+    };
+    match prefix {
+        "" => process(["git commit -m \"", &message_string, "\" 1> /dev/null"].join("").as_str()),
+        n => process(["git commit -m \"", n, &message_string[2..], "\" 1> /dev/null"].join("").as_str())
+    };
 }
 
 fn commit_trigger(matches: &clap::ArgMatches) {
