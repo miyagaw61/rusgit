@@ -314,6 +314,50 @@ fn ac_trigger(matches: &clap::ArgMatches) {
         let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("message").unwrap().collect();
         let message: String = message.join(" ");
         message
+    } else if matches.subcommand_matches("ac").unwrap().is_present("improve") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("improve").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Improve ", &message].join(" ")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("implement") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("implement").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Implement ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("refactor") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("refactor").unwrap().collect();
+        let message: String = message.join(" ");
+        ["refactor ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("use") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("use").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Use ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("update") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("update").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Update ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("add") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("add").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Add ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("change") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("change").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Change ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("fix") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("fix").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Fix ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("support") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("support").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Support ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("allow") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("allow").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Allow ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("avoid") {
+        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("avoid").unwrap().collect();
+        let message: String = message.join(" ");
+        ["Avoid ", &message].join("")
     } else {
         "".to_string()
     };
@@ -806,6 +850,102 @@ ARGS:
                          .help("commit message")
                          .short("m")
                          .long("message")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("improve")
+                         .value_name("message")
+                         .help("improve-prefix message")
+                         .short("i")
+                         .long("improve")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("implement")
+                         .value_name("message")
+                         .help("implement-prefix message")
+                         .short("I")
+                         .long("implement")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("remove")
+                         .value_name("message")
+                         .help("remove-prefix message")
+                         .short("r")
+                         .long("remove")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("refactor")
+                         .value_name("message")
+                         .help("refactor-prefix message")
+                         .short("R")
+                         .long("refactor")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("use")
+                         .value_name("message")
+                         .help("use-prefix message")
+                         .short("u")
+                         .long("use")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("update")
+                         .value_name("message")
+                         .help("update-prefix message")
+                         .short("U")
+                         .long("update")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("add")
+                         .value_name("message")
+                         .help("add-prefix message")
+                         .short("a")
+                         .long("add")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("change")
+                         .value_name("message")
+                         .help("change-prefix message")
+                         .short("c")
+                         .long("change")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("fix")
+                         .value_name("message")
+                         .help("fix-prefix message")
+                         .short("f")
+                         .long("fix")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("support")
+                         .value_name("message")
+                         .help("support-prefix message")
+                         .short("s")
+                         .long("support")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("allow")
+                         .value_name("message")
+                         .help("allow-prefix message")
+                         .short("l")
+                         .long("allow")
+                         .takes_value(true)
+                         .multiple(true)
+                         )
+                    .arg(Arg::with_name("avoid")
+                         .value_name("message")
+                         .help("avoid-prefix message")
+                         .short("v")
+                         .long("avoid")
                          .takes_value(true)
                          .multiple(true)
                          )
