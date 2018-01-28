@@ -310,57 +310,71 @@ fn ac(files: Vec<&str>, message: &str) {
 
 fn ac_trigger(matches: &clap::ArgMatches) {
     let files: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("files").unwrap().collect();
-    let message: String = if matches.subcommand_matches("ac").unwrap().is_present("message") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("message").unwrap().collect();
-        let message: String = message.join(" ");
+    let mut message: String = if matches.subcommand_matches("ac").unwrap().is_present("message") {
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("message").unwrap().collect();
+        let mut message: String = message.join(" ");
         message
     } else if matches.subcommand_matches("ac").unwrap().is_present("improve") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("improve").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("improve").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Improve ", &message].join(" ")
     } else if matches.subcommand_matches("ac").unwrap().is_present("implement") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("implement").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("implement").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Implement ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("refactor") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("refactor").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("refactor").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["refactor ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("use") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("use").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("use").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Use ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("update") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("update").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("update").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Update ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("add") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("add").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("add").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Add ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("change") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("change").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("change").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Change ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("fix") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("fix").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("fix").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Fix ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("support") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("support").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("support").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Support ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("allow") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("allow").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("allow").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Allow ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("avoid") {
-        let message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("avoid").unwrap().collect();
-        let message: String = message.join(" ");
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("avoid").unwrap().collect();
+        let mut message: String = message.join(" ");
         ["Avoid ", &message].join("")
     } else {
         "".to_string()
     };
+    let last = message.chars().count()-1;
+    let last3: String = message.chars().skip(last-2).collect();
+    let last4: String = message.chars().skip(last-3).collect();
+    if files.len() == 1 {
+        match &last3[..] {
+            " to" => message = [&message, files[0]].join(" "),
+            " in" => message = [&message, files[0]].join(" "),
+            _ => print!("")
+        };
+        match &last4[..] {
+            " for" => message = [&message, files[0]].join(" "),
+            _ => print!("")
+        };
+    }
     ac(files, &message);
     process("git log --decorate=short --oneline -1 --color");
 }
