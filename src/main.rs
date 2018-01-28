@@ -753,6 +753,172 @@ fn reflog(branch_name: &str, all: bool) {
     }
 }
 
+fn complete(matches: &clap::ArgMatches) {
+    let text = "\
+rusgit_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    set ${COMP_WORDS[@]}
+    if test \"$prev\" = \"rusgit\" ;then
+        opts=\"ac add alias branch clone commit diff help log merge pull push rebase status tag undo\"
+        COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+    elif test \"$(echo $2 | grep -E \"(ac|add|diff)\")\" ;then
+        COMPREPLY=( $(compgen -f -- \"${cur}\") )
+    elif test \"$(echo $2 | grep -E \"(branch|merge|pull|push|rebase)\")\" ;then
+        opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+        COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+    elif test \"$2\" = \"undo\" ;then
+        if test \"$(echo $3 | grep -E \"(add|head)\")\" ;then
+            COMPREPLY=( $(compgen -f -- \"${cur}\") )
+        else 
+            opts=\"add commit head orig\"
+            COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+        fi
+    elif test \"$2\" = \"tag\" ;then
+        if test \"$(echo $3 | grep -E \"(-d|-s)\")\" ;then
+            opts=\"$(git tag)\"
+            COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+        fi
+    fi
+}
+complete -F rusgit_complete rusgit";
+    println!("{}", text);
+    if matches.subcommand_matches("complete").unwrap().is_present("ac") {
+        let text = "\
+rusgit__ac_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+}
+complete -F rusgit__ac_complete _ac";
+        let text = text.replace("_ac", matches.subcommand_matches("complete").unwrap().value_of("ac").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("add") {
+        let text = "\
+rusgit__add_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+}
+complete -F rusgit__add_complete _add";
+        let text = text.replace("_add", matches.subcommand_matches("complete").unwrap().value_of("add").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("diff") {
+        let text = "\
+rusgit__diff_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+}
+complete -F rusgit__diff_complete _diff";
+        let text = text.replace("_diff", matches.subcommand_matches("complete").unwrap().value_of("diff").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("branch") {
+        let text = "\
+rusgit__branch_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__branch_complete _branch";
+        let text = text.replace("_branch", matches.subcommand_matches("complete").unwrap().value_of("branch").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("merge") {
+        let text = "\
+rusgit__merge_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__merge_complete _merge";
+        let text = text.replace("_merge", matches.subcommand_matches("complete").unwrap().value_of("merge").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("pull") {
+        let text = "\
+rusgit__pull_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__pull_complete _pull";
+        let text = text.replace("_pull", matches.subcommand_matches("complete").unwrap().value_of("pull").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("push") {
+        let text = "\
+rusgit__push_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__push_complete _push";
+        let text = text.replace("_push", matches.subcommand_matches("complete").unwrap().value_of("push").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("rebase") {
+        let text = "\
+rusgit__rebase_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__rebase_complete _rebase";
+        let text = text.replace("_rebase", matches.subcommand_matches("complete").unwrap().value_of("rebase").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("undo") {
+        let text = "\
+rusgit__undo_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    set ${COMP_WORDS[@]}
+    if test \"$(echo $2 | grep -E \"(add|head)\")\" ;then
+        COMPREPLY=( $(compgen -f) )
+    else 
+        opts=\"add commit head orig\"
+        COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+    fi
+}
+complete -F rusgit__undo_complete _undo";
+        let text = text.replace("_undo", matches.subcommand_matches("complete").unwrap().value_of("undo").unwrap());
+        println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("tag") {
+        let text = "\
+rusgit__tag_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    set ${COMP_WORDS[@]}
+    if test \"$(echo $2 | grep -E \"(-d|-s)\")\" ;then
+        opts=\"$(git tag)\"
+        COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+    fi
+}
+complete -F rusgit__tag_complete _tag";
+        let text = text.replace("_tag", matches.subcommand_matches("complete").unwrap().value_of("tag").unwrap());
+        println!("{}", text);
+    }
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("1.0.0")
@@ -1105,6 +1271,59 @@ ARGS:
                          .takes_value(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("complete")
+                    .about("completiton subcommand")
+                    .arg(Arg::with_name("ac")
+                         .help("ac-subcommand alias")
+                         .long("ac")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("add")
+                         .help("add-subcommand alias")
+                         .long("add")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("diff")
+                         .help("diff-subcommand alias")
+                         .long("diff")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("branch")
+                         .help("branch-subcommand alias")
+                         .long("branch")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("merge")
+                         .help("merge-subcommand alias")
+                         .long("merge")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("pull")
+                         .help("pull-subcommand alias")
+                         .long("pull")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("push")
+                         .help("push-subcommand alias")
+                         .long("push")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("rebase")
+                         .help("rebase-subcommand alias")
+                         .long("rebase")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("undo")
+                         .help("undo-subcommand alias")
+                         .long("undo")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("tag")
+                         .help("tag-subcommand alias")
+                         .long("tag")
+                         .takes_value(true)
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -1125,6 +1344,7 @@ ARGS:
         "clone" => clone(&matches),
         "undo" => undo(&matches),
         "tag" => tag_trigger(&matches),
+        "complete" => complete(&matches),
         _ => help()
     } 
 }
