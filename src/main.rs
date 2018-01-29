@@ -771,7 +771,8 @@ rusgit__ac_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     COMPREPLY=( $(compgen -f -- \"${cur}\") )
 }
-complete -F rusgit__ac_complete _ac";
+complete -F rusgit__ac_complete _ac
+alias _ac=\"rusgit ac\"";
         let text = text.replace("_ac", matches.subcommand_matches("complete").unwrap().value_of("ac").unwrap());
         println!("{}", text);
     }
@@ -783,7 +784,8 @@ rusgit__add_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     COMPREPLY=( $(compgen -f -- \"${cur}\") )
 }
-complete -F rusgit__add_complete _add";
+complete -F rusgit__add_complete _add
+alias _add=\"rusgit add\"";
         let text = text.replace("_add", matches.subcommand_matches("complete").unwrap().value_of("add").unwrap());
         println!("{}", text);
     }
@@ -795,7 +797,8 @@ rusgit__diff_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     COMPREPLY=( $(compgen -f -- \"${cur}\") )
 }
-complete -F rusgit__diff_complete _diff";
+complete -F rusgit__diff_complete _diff
+alias _diff=\"rusgit diff\"";
         let text = text.replace("_diff", matches.subcommand_matches("complete").unwrap().value_of("diff").unwrap());
         println!("{}", text);
     }
@@ -808,7 +811,8 @@ rusgit__branch_complete() {
     opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
     COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
 }
-complete -F rusgit__branch_complete _branch";
+complete -F rusgit__branch_complete _branch
+alias _branch=\"rusgit branch\"";
         let text = text.replace("_branch", matches.subcommand_matches("complete").unwrap().value_of("branch").unwrap());
         println!("{}", text);
     }
@@ -821,7 +825,8 @@ rusgit__merge_complete() {
     opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
     COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
 }
-complete -F rusgit__merge_complete _merge";
+complete -F rusgit__merge_complete _merge
+alias _merge=\"rusgit merge\"";
         let text = text.replace("_merge", matches.subcommand_matches("complete").unwrap().value_of("merge").unwrap());
         println!("{}", text);
     }
@@ -834,7 +839,8 @@ rusgit__pull_complete() {
     opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
     COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
 }
-complete -F rusgit__pull_complete _pull";
+complete -F rusgit__pull_complete _pull
+alias _pull=\"rusgit pull\"";
         let text = text.replace("_pull", matches.subcommand_matches("complete").unwrap().value_of("pull").unwrap());
         println!("{}", text);
     }
@@ -847,7 +853,8 @@ rusgit__push_complete() {
     opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
     COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
 }
-complete -F rusgit__push_complete _push";
+complete -F rusgit__push_complete _push
+alias _push=\"rusgit push\"";
         let text = text.replace("_push", matches.subcommand_matches("complete").unwrap().value_of("push").unwrap());
         println!("{}", text);
     }
@@ -860,7 +867,8 @@ rusgit__rebase_complete() {
     opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
     COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
 }
-complete -F rusgit__rebase_complete _rebase";
+complete -F rusgit__rebase_complete _rebase
+alias _rebase=\"rusgit rebase\"";
         let text = text.replace("_rebase", matches.subcommand_matches("complete").unwrap().value_of("rebase").unwrap());
         println!("{}", text);
     }
@@ -878,7 +886,8 @@ rusgit__undo_complete() {
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     fi
 }
-complete -F rusgit__undo_complete _undo";
+complete -F rusgit__undo_complete _undo
+alias _undo=\"rusgit undo\"";
         let text = text.replace("_undo", matches.subcommand_matches("complete").unwrap().value_of("undo").unwrap());
         println!("{}", text);
     }
@@ -894,9 +903,26 @@ rusgit__tag_complete() {
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     fi
 }
-complete -F rusgit__tag_complete _tag";
+complete -F rusgit__tag_complete _tag
+alias _tag=\"rusgit tag\"";
         let text = text.replace("_tag", matches.subcommand_matches("complete").unwrap().value_of("tag").unwrap());
         println!("{}", text);
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("log") {
+        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("log").unwrap(), "=\"rusgit log\""].join("").as_str());
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("commit") {
+        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("commit").unwrap(), "=\"rusgit commit\""].join("").as_str());
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("clone") {
+        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("clone").unwrap(), "=\"rusgit clone\""].join("").as_str());
+    }
+
+    if matches.subcommand_matches("complete").unwrap().is_present("status") {
+        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("status").unwrap(), "=\"rusgit status\""].join("").as_str());
     }
 }
 
@@ -1299,6 +1325,26 @@ ARGS:
                     .arg(Arg::with_name("tag")
                          .help("tag-subcommand alias")
                          .long("tag")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("log")
+                         .help("log-subcommand alias")
+                         .long("log")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("commit")
+                         .help("commit-subcommand alias")
+                         .long("commit")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("clone")
+                         .help("clone-subcommand alias")
+                         .long("clone")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("status")
+                         .help("status-subcommand alias")
+                         .long("status")
                          .takes_value(true)
                          )
                     )
