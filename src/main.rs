@@ -576,25 +576,6 @@ fn rebase(branch_name: &str) {
     ].join(" ").as_str());
 }
 
-fn alias() {
-    println!("\
-alias rs=\"rusgit status\"
-alias ra=\"rusgit add\"
-alias rc=\"rusgit commit\"
-alias rac=\"rusgit ac\"
-alias rl=\"rusgit log\"
-alias rd=\"rusgit diff\"
-alias rb=\"rusgit branch\"
-alias ru=\"rusgit undo\"
-alias rt=\"rusgit tag\"
-alias rpush=\"rusgit push\"
-alias rpull=\"rusgit pull\"
-alias rmerge=\"rusgit merge\"
-alias rrebase=\"rusgit rebase\"
-alias rclone=\"rusgit clone\"\
-");
-}
-
 fn clone(matches: &clap::ArgMatches) {
     process([
             "git clone ",
@@ -1198,9 +1179,6 @@ ARGS:
                          .value_name("commit-id")
                          )
                     )
-        .subcommand(SubCommand::with_name("alias")
-                    .about("print aliases")
-                    )
         .subcommand(SubCommand::with_name("clone")
                     .about("improved git-clone")
                     .arg(Arg::with_name("repo")
@@ -1340,7 +1318,6 @@ ARGS:
         "merge" => merge_trigger(&matches),
         "rebase" => rebase_trigger(&matches),
         "ac" => ac_trigger(&matches),
-        "alias" => alias(),
         "clone" => clone(&matches),
         "undo" => undo(&matches),
         "tag" => tag_trigger(&matches),
