@@ -910,7 +910,20 @@ alias _tag=\"rusgit tag\"";
     }
 
     if matches.subcommand_matches("complete").unwrap().is_present("log") {
-        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("log").unwrap(), "=\"rusgit log\""].join("").as_str());
+        let text = "\
+rusgit__log_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    set ${COMP_WORDS[@]}
+    if test \"$2\" = \"-r\" ;then
+        opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+        COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+    fi
+}
+complete -F rusgit__log_complete _log
+alias _log=\"rusgit log\"";
+        let text = text.replace("_log", matches.subcommand_matches("complete").unwrap().value_of("log").unwrap());
+        println!("{}", text);
     }
 
     if matches.subcommand_matches("complete").unwrap().is_present("commit") {
