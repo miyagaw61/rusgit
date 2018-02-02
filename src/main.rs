@@ -965,7 +965,7 @@ alias _log=\"rusgit log\"";
 
 fn main() {
     let matches = App::new("rusgit")
-        .version("1.0.0")
+        .version("2.0.0")
         .author("miyagaw61 <miyagaw61@gmail.com>")
         .about("Git Wrapper in Rust")
         .subcommand(SubCommand::with_name("status")
