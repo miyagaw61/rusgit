@@ -328,7 +328,7 @@ fn ac_trigger(matches: &clap::ArgMatches) {
     } else if matches.subcommand_matches("ac").unwrap().is_present("refactor") {
         let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("refactor").unwrap().collect();
         let mut message: String = message.join(" ");
-        ["refactor ", &message].join("")
+        ["Refactor ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("use") {
         let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("use").unwrap().collect();
         let mut message: String = message.join(" ");
