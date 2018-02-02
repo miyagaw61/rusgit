@@ -361,6 +361,10 @@ fn ac_trigger(matches: &clap::ArgMatches) {
         let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("avoid").unwrap().collect();
         let mut message: String = message.join(" ");
         ["Avoid ", &message].join("")
+    } else if matches.subcommand_matches("ac").unwrap().is_present("remove") {
+        let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("remove").unwrap().collect();
+        let mut message: String = message.join(" ");
+        ["Remove ", &message].join("")
     } else {
         "".to_string()
     };
