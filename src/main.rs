@@ -159,22 +159,25 @@ fn commit(message: &str) {
         },
         _ => message_string = message.to_string()
     };
-    let prefix = match &message_string[0..2] {
-        "i " => "Improve ",
-        "I " => "Implement ",
-        "r " => "Remove ",
-        "R " => "Refactor ",
-        "u " => "Use ",
-        "U " => "Update ",
-        "a " => "Add ",
-        "c " => "Change ",
-        "f " => "Fix ",
-        "s " => "Support ",
-        "l " => "Allow ",
-        "v " => "Avoid ",
-        _ => ""
-    };
-    match prefix {
+    let mut prefix: String = "".to_string();
+    if message_string.chars().count() > 2 {
+        prefix = match &message_string[0..2] {
+            "i " => "Improve ".to_string(),
+            "I " => "Implement ".to_string(),
+            "r " => "Remove ".to_string(),
+            "R " => "Refactor ".to_string(),
+            "u " => "Use ".to_string(),
+            "U " => "Update ".to_string(),
+            "a " => "Add ".to_string(),
+            "c " => "Change ".to_string(),
+            "f " => "Fix ".to_string(),
+            "s " => "Support ".to_string(),
+            "l " => "Allow ".to_string(),
+            "v " => "Avoid ".to_string(),
+            _ => "".to_string()
+        };
+    }
+    match &prefix[..] {
         "" => process(["git commit -m \"", &message_string, "\" 1> /dev/null"].join("").as_str()),
         n => process(["git commit -m \"", n, &message_string[2..], "\" 1> /dev/null"].join("").as_str())
     };
