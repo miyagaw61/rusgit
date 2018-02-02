@@ -1245,7 +1245,7 @@ ARGS:
         .subcommand(SubCommand::with_name("clone")
                     .about("improved git-clone")
                     .arg(Arg::with_name("repo")
-                         .help("repository name")
+                         .help("user-name/repository-name")
                          .required(true)
                          .index(1)
                          )
