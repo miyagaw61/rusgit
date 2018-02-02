@@ -706,7 +706,6 @@ fn tag_trigger(matches: &clap::ArgMatches) {
         ].join("").as_str());
     } else if tag_name == "" {
         process("git tag");
-        std::process::exit(0);
     } else if matches.subcommand_matches("tag").unwrap().is_present("editor") {
         process([
                 "git tag -a ",
