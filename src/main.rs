@@ -362,18 +362,24 @@ fn ac_trigger(matches: &clap::ArgMatches) {
         "".to_string()
     };
     let last = message.chars().count()-1;
-    let last3: String = message.chars().skip(last-2).collect();
-    let last4: String = message.chars().skip(last-3).collect();
-    if files.len() == 1 {
-        match &last3[..] {
-            " to" => message = [&message, files[0]].join(" "),
-            " in" => message = [&message, files[0]].join(" "),
-            _ => print!("")
-        };
-        match &last4[..] {
-            " for" => message = [&message, files[0]].join(" "),
-            _ => print!("")
-        };
+    if last > 1 {
+        let last3: String = message.chars().skip(last-2).collect();
+        if files.len() == 1 {
+            match &last3[..] {
+                " to" => message = [&message, files[0]].join(" "),
+                " in" => message = [&message, files[0]].join(" "),
+                _ => print!("")
+            };
+        }
+    }
+    if last > 2 {
+        let last4: String = message.chars().skip(last-3).collect();
+        if files.len() == 1 {
+            match &last4[..] {
+                " for" => message = [&message, files[0]].join(" "),
+                _ => print!("")
+            };
+        }
     }
     ac(files, &message);
     process("git log --decorate=short --oneline -1 --color");
