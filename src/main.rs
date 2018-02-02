@@ -707,6 +707,15 @@ fn tag_trigger(matches: &clap::ArgMatches) {
     } else if tag_name == "" {
         process("git tag");
         std::process::exit(0);
+    } else if matches.subcommand_matches("tag").unwrap().is_present("editor") {
+        process([
+                "git tag -a ",
+                tag_name
+        ].join("").as_str());
+        process([
+                "git push origin ",
+                tag_name
+        ].join("").as_str());
     } else if matches.subcommand_matches("tag").unwrap().is_present("message") {
         let message: Vec<&str> = matches.subcommand_matches("tag").unwrap().values_of("message").unwrap().collect();
         let message: String = message.join(" ");
@@ -1299,6 +1308,11 @@ ARGS:
                          .long("message")
                          .takes_value(true)
                          .multiple(true)
+                         )
+                    .arg(Arg::with_name("editor")
+                         .help("open editor")
+                         .short("e")
+                         .long("editor")
                          )
                     .arg(Arg::with_name("delete")
                          .help("delete tag")
