@@ -590,11 +590,22 @@ fn rebase(branch_name: &str) {
 }
 
 fn clone(matches: &clap::ArgMatches) {
-    process([
-            "git clone ",
-            "https://github.com/",
-            matches.subcommand_matches("clone").unwrap().value_of("repo").unwrap()
-    ].join("").as_str());
+    if matches.subcommand_matches("clone").unwrap().is_present("directory") {
+        process([
+                "git clone ",
+                "https://github.com/",
+                matches.subcommand_matches("clone").unwrap().value_of("repo").unwrap(),
+                " ",
+                matches.subcommand_matches("clone").unwrap().value_of("directory").unwrap(),
+                " "
+        ].join("").as_str());
+    } else {
+        process([
+                "git clone ",
+                "https://github.com/",
+                matches.subcommand_matches("clone").unwrap().value_of("repo").unwrap()
+        ].join("").as_str());
+    }
 }
 
 fn undo(matches: &clap::ArgMatches) {
@@ -1236,6 +1247,11 @@ ARGS:
                     .arg(Arg::with_name("repo")
                          .help("repository name")
                          .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::with_name("directory")
+                         .help("dest directory name")
+                         .index(2)
                          )
                     )
         .subcommand(SubCommand::with_name("undo")
