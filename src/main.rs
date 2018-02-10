@@ -368,6 +368,11 @@ fn ac_trigger(matches: &clap::ArgMatches) {
     } else {
         "".to_string()
     };
+    if message == "".to_string() {
+        ac(files, &message);
+        process("git log --decorate=short --oneline -1 --color");
+        std::process::exit(0);
+    }
     let last = message.chars().count()-1;
     if last > 1 {
         let last3: String = message.chars().skip(last-2).collect();
