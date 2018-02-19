@@ -783,7 +783,7 @@ rusgit_complete() {
     elif test \"$(echo $2 | grep -E \"(add|ac|diff)\")\" ;then
         dir=\"$(echo ${cur} | grep -o \".*/\")\"
         if test \"${dir}\" ;then
-            COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+            COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
         else 
             COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
         fi
@@ -792,8 +792,9 @@ rusgit_complete() {
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     elif test \"$2\" = \"undo\" ;then
         if test \"$(echo $3 | grep -E \"(add|head)\")\" ;then
-            if test \"$(echo ${cur} | grep \"/$\")\" ;then
-                COMPREPLY=( $(compgen -W \"${cur}\"\"$(ls -F ${cur})\" -- \"${cur}\") )
+            dir=\"$(echo ${cur} | grep -o \".*/\")\"
+            if test \"${dir}\" ;then
+                COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
             else 
                 COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
             fi
@@ -817,7 +818,7 @@ rusgit__ac_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     dir=\"$(echo ${cur} | grep -o \".*/\")\"
     if test \"${dir}\" ;then
-        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+        COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
     else 
         COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
     fi
@@ -835,7 +836,7 @@ rusgit__add_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     dir=\"$(echo ${cur} | grep -o \".*/\")\"
     if test \"${dir}\" ;then
-        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+        COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
     else 
         COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
     fi
@@ -853,7 +854,7 @@ rusgit__diff_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     dir=\"$(echo ${cur} | grep -o \".*/\")\"
     if test \"${dir}\" ;then
-        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+        COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
     else 
         COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
     fi
@@ -943,7 +944,7 @@ rusgit__undo_complete() {
     if test \"$(echo $2 | grep -E \"(add|head)\")\" ;then
         dir=\"$(echo ${cur} | grep -o \".*/\")\"
         if test \"${dir}\" ;then
-            COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+            COMPREPLY=( $(compgen -W \"$(ls -F ${dir} | sed -E \"s@(.*)@${dir}\\1@g\")\" -- \"${cur}\") )
         else 
             COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
         fi
