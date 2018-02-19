@@ -771,14 +771,14 @@ fn reflog(branch_name: &str, all: bool) {
     }
 }
 
-fn complete(matches: &clap::ArgMatches) {
+fn init(matches: &clap::ArgMatches) {
     let text = "\
 rusgit_complete() {
     local cur prev cword opts
     _get_comp_words_by_ref -n : cur prev cword
     set ${COMP_WORDS[@]}
     if test \"$prev\" = \"rusgit\" ;then
-        opts=\"ac add alias branch clone commit diff help log merge pull push rebase status tag undo\"
+        opts=\"ac add alias branch clone commit diff help log merge pull push rebase status tag undo init\"
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     elif test \"$(echo $2 | grep -E \"(ac|add|diff)\")\" ;then
         COMPREPLY=( $(compgen -f -- \"${cur}\") )
@@ -801,7 +801,7 @@ rusgit_complete() {
 }
 complete -F rusgit_complete rusgit";
     println!("{}", text);
-    if matches.subcommand_matches("complete").unwrap().is_present("ac") {
+    if matches.subcommand_matches("init").unwrap().is_present("ac") {
         let text = "\
 rusgit__ac_complete() {
     local cur prev cword opts
@@ -810,11 +810,11 @@ rusgit__ac_complete() {
 }
 complete -F rusgit__ac_complete _ac
 alias _ac=\"rusgit ac\"";
-        let text = text.replace("_ac", matches.subcommand_matches("complete").unwrap().value_of("ac").unwrap());
+        let text = text.replace("_ac", matches.subcommand_matches("init").unwrap().value_of("ac").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("add") {
+    if matches.subcommand_matches("init").unwrap().is_present("add") {
         let text = "\
 rusgit__add_complete() {
     local cur prev cword opts
@@ -823,11 +823,11 @@ rusgit__add_complete() {
 }
 complete -F rusgit__add_complete _add
 alias _add=\"rusgit add\"";
-        let text = text.replace("_add", matches.subcommand_matches("complete").unwrap().value_of("add").unwrap());
+        let text = text.replace("_add", matches.subcommand_matches("init").unwrap().value_of("add").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("diff") {
+    if matches.subcommand_matches("init").unwrap().is_present("diff") {
         let text = "\
 rusgit__diff_complete() {
     local cur prev cword opts
@@ -836,11 +836,11 @@ rusgit__diff_complete() {
 }
 complete -F rusgit__diff_complete _diff
 alias _diff=\"rusgit diff\"";
-        let text = text.replace("_diff", matches.subcommand_matches("complete").unwrap().value_of("diff").unwrap());
+        let text = text.replace("_diff", matches.subcommand_matches("init").unwrap().value_of("diff").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("branch") {
+    if matches.subcommand_matches("init").unwrap().is_present("branch") {
         let text = "\
 rusgit__branch_complete() {
     local cur prev cword opts
@@ -850,11 +850,11 @@ rusgit__branch_complete() {
 }
 complete -F rusgit__branch_complete _branch
 alias _branch=\"rusgit branch\"";
-        let text = text.replace("_branch", matches.subcommand_matches("complete").unwrap().value_of("branch").unwrap());
+        let text = text.replace("_branch", matches.subcommand_matches("init").unwrap().value_of("branch").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("merge") {
+    if matches.subcommand_matches("init").unwrap().is_present("merge") {
         let text = "\
 rusgit__merge_complete() {
     local cur prev cword opts
@@ -864,11 +864,11 @@ rusgit__merge_complete() {
 }
 complete -F rusgit__merge_complete _merge
 alias _merge=\"rusgit merge\"";
-        let text = text.replace("_merge", matches.subcommand_matches("complete").unwrap().value_of("merge").unwrap());
+        let text = text.replace("_merge", matches.subcommand_matches("init").unwrap().value_of("merge").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("pull") {
+    if matches.subcommand_matches("init").unwrap().is_present("pull") {
         let text = "\
 rusgit__pull_complete() {
     local cur prev cword opts
@@ -878,11 +878,11 @@ rusgit__pull_complete() {
 }
 complete -F rusgit__pull_complete _pull
 alias _pull=\"rusgit pull\"";
-        let text = text.replace("_pull", matches.subcommand_matches("complete").unwrap().value_of("pull").unwrap());
+        let text = text.replace("_pull", matches.subcommand_matches("init").unwrap().value_of("pull").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("push") {
+    if matches.subcommand_matches("init").unwrap().is_present("push") {
         let text = "\
 rusgit__push_complete() {
     local cur prev cword opts
@@ -892,11 +892,11 @@ rusgit__push_complete() {
 }
 complete -F rusgit__push_complete _push
 alias _push=\"rusgit push\"";
-        let text = text.replace("_push", matches.subcommand_matches("complete").unwrap().value_of("push").unwrap());
+        let text = text.replace("_push", matches.subcommand_matches("init").unwrap().value_of("push").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("rebase") {
+    if matches.subcommand_matches("init").unwrap().is_present("rebase") {
         let text = "\
 rusgit__rebase_complete() {
     local cur prev cword opts
@@ -906,30 +906,34 @@ rusgit__rebase_complete() {
 }
 complete -F rusgit__rebase_complete _rebase
 alias _rebase=\"rusgit rebase\"";
-        let text = text.replace("_rebase", matches.subcommand_matches("complete").unwrap().value_of("rebase").unwrap());
+        let text = text.replace("_rebase", matches.subcommand_matches("init").unwrap().value_of("rebase").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("undo") {
+    if matches.subcommand_matches("init").unwrap().is_present("undo") {
         let text = "\
 rusgit__undo_complete() {
     local cur prev cword opts
     _get_comp_words_by_ref -n : cur prev cword
     set ${COMP_WORDS[@]}
     if test \"$(echo $2 | grep -E \"(add|head)\")\" ;then
-        COMPREPLY=( $(compgen -f) )
+        if test \"$(echo ${cur} | grep \"/$\")\" ;then
+            COMPREPLY=( $(compgen -W \"${cur}\"\"$(ls -F ${cur})\" -- \"${cur}\") )
+        else 
+            COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+        fi
     else 
         opts=\"add commit head orig\"
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     fi
 }
-complete -F rusgit__undo_complete _undo
+complete -o nospace -F rusgit__undo_complete _undo
 alias _undo=\"rusgit undo\"";
-        let text = text.replace("_undo", matches.subcommand_matches("complete").unwrap().value_of("undo").unwrap());
+        let text = text.replace("_undo", matches.subcommand_matches("init").unwrap().value_of("undo").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("tag") {
+    if matches.subcommand_matches("init").unwrap().is_present("tag") {
         let text = "\
 rusgit__tag_complete() {
     local cur prev cword opts
@@ -942,11 +946,11 @@ rusgit__tag_complete() {
 }
 complete -F rusgit__tag_complete _tag
 alias _tag=\"rusgit tag\"";
-        let text = text.replace("_tag", matches.subcommand_matches("complete").unwrap().value_of("tag").unwrap());
+        let text = text.replace("_tag", matches.subcommand_matches("init").unwrap().value_of("tag").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("log") {
+    if matches.subcommand_matches("init").unwrap().is_present("log") {
         let text = "\
 rusgit__log_complete() {
     local cur prev cword opts
@@ -959,20 +963,20 @@ rusgit__log_complete() {
 }
 complete -F rusgit__log_complete _log
 alias _log=\"rusgit log\"";
-        let text = text.replace("_log", matches.subcommand_matches("complete").unwrap().value_of("log").unwrap());
+        let text = text.replace("_log", matches.subcommand_matches("init").unwrap().value_of("log").unwrap());
         println!("{}", text);
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("commit") {
-        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("commit").unwrap(), "=\"rusgit commit\""].join("").as_str());
+    if matches.subcommand_matches("init").unwrap().is_present("commit") {
+        println!("{}", ["alias ", matches.subcommand_matches("init").unwrap().value_of("commit").unwrap(), "=\"rusgit commit\""].join("").as_str());
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("clone") {
-        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("clone").unwrap(), "=\"rusgit clone\""].join("").as_str());
+    if matches.subcommand_matches("init").unwrap().is_present("clone") {
+        println!("{}", ["alias ", matches.subcommand_matches("init").unwrap().value_of("clone").unwrap(), "=\"rusgit clone\""].join("").as_str());
     }
 
-    if matches.subcommand_matches("complete").unwrap().is_present("status") {
-        println!("{}", ["alias ", matches.subcommand_matches("complete").unwrap().value_of("status").unwrap(), "=\"rusgit status\""].join("").as_str());
+    if matches.subcommand_matches("init").unwrap().is_present("status") {
+        println!("{}", ["alias ", matches.subcommand_matches("init").unwrap().value_of("status").unwrap(), "=\"rusgit status\""].join("").as_str());
     }
 }
 
@@ -1335,7 +1339,7 @@ ARGS:
                          .takes_value(true)
                          )
                     )
-        .subcommand(SubCommand::with_name("complete")
+        .subcommand(SubCommand::with_name("init")
                     .about("completiton subcommand")
                     .arg(Arg::with_name("ac")
                          .help("ac-subcommand alias")
@@ -1427,7 +1431,7 @@ ARGS:
         "clone" => clone(&matches),
         "undo" => undo(&matches),
         "tag" => tag_trigger(&matches),
-        "complete" => complete(&matches),
+        "init" => init(&matches),
         _ => help()
     } 
 }
