@@ -289,7 +289,7 @@ fn diff_trigger(matches: &clap::ArgMatches) {
     let file_vec: Vec<char> = file.chars().collect();
     if file.contains("..") {
         let chars_count = file.chars().count();
-        if file_vec[0] == '.' && file_vec[1] == '.' {
+        if file_vec[0] == '.' && file_vec[1] == '.' && file_vec[2] != '/' {
             diff([
                  "HEAD..origin/".to_string(),
                  file_vec[2..].iter().collect()
