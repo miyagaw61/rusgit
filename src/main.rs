@@ -780,14 +780,23 @@ rusgit_complete() {
     if test \"$prev\" = \"rusgit\" ;then
         opts=\"ac add alias branch clone commit diff help log merge pull push rebase status tag undo init\"
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
-    elif test \"$(echo $2 | grep -E \"(ac|add|diff)\")\" ;then
-        COMPREPLY=( $(compgen -f -- \"${cur}\") )
+    elif test \"$(echo $2 | grep -E \"(add|ac|diff)\")\" ;then
+        dir=\"$(echo ${cur} | grep -o \".*/\")\"
+        if test \"${dir}\" ;then
+            COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+        else 
+            COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+        fi
     elif test \"$(echo $2 | grep -E \"(branch|merge|pull|push|rebase)\")\" ;then
         opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     elif test \"$2\" = \"undo\" ;then
         if test \"$(echo $3 | grep -E \"(add|head)\")\" ;then
-            COMPREPLY=( $(compgen -f -- \"${cur}\") )
+            if test \"$(echo ${cur} | grep \"/$\")\" ;then
+                COMPREPLY=( $(compgen -W \"${cur}\"\"$(ls -F ${cur})\" -- \"${cur}\") )
+            else 
+                COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+            fi
         else 
             opts=\"add commit head orig\"
             COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
@@ -799,16 +808,21 @@ rusgit_complete() {
         fi
     fi
 }
-complete -F rusgit_complete rusgit";
+complete -o nospace -F rusgit_complete rusgit";
     println!("{}", text);
     if matches.subcommand_matches("init").unwrap().is_present("ac") {
         let text = "\
 rusgit__ac_complete() {
     local cur prev cword opts
     _get_comp_words_by_ref -n : cur prev cword
-    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+    dir=\"$(echo ${cur} | grep -o \".*/\")\"
+    if test \"${dir}\" ;then
+        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+    else 
+        COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+    fi
 }
-complete -F rusgit__ac_complete _ac
+complete -o nospace -F rusgit__ac_complete _ac
 alias _ac=\"rusgit ac\"";
         let text = text.replace("_ac", matches.subcommand_matches("init").unwrap().value_of("ac").unwrap());
         println!("{}", text);
@@ -819,9 +833,14 @@ alias _ac=\"rusgit ac\"";
 rusgit__add_complete() {
     local cur prev cword opts
     _get_comp_words_by_ref -n : cur prev cword
-    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+    dir=\"$(echo ${cur} | grep -o \".*/\")\"
+    if test \"${dir}\" ;then
+        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+    else 
+        COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+    fi
 }
-complete -F rusgit__add_complete _add
+complete -o nospace -F rusgit__add_complete _add
 alias _add=\"rusgit add\"";
         let text = text.replace("_add", matches.subcommand_matches("init").unwrap().value_of("add").unwrap());
         println!("{}", text);
@@ -832,9 +851,14 @@ alias _add=\"rusgit add\"";
 rusgit__diff_complete() {
     local cur prev cword opts
     _get_comp_words_by_ref -n : cur prev cword
-    COMPREPLY=( $(compgen -f -- \"${cur}\") )
+    dir=\"$(echo ${cur} | grep -o \".*/\")\"
+    if test \"${dir}\" ;then
+        COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
+    else 
+        COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
+    fi
 }
-complete -F rusgit__diff_complete _diff
+complete -o nospace -F rusgit__diff_complete _diff
 alias _diff=\"rusgit diff\"";
         let text = text.replace("_diff", matches.subcommand_matches("init").unwrap().value_of("diff").unwrap());
         println!("{}", text);
@@ -917,8 +941,9 @@ rusgit__undo_complete() {
     _get_comp_words_by_ref -n : cur prev cword
     set ${COMP_WORDS[@]}
     if test \"$(echo $2 | grep -E \"(add|head)\")\" ;then
-        if test \"$(echo ${cur} | grep \"/$\")\" ;then
-            COMPREPLY=( $(compgen -W \"${cur}\"\"$(ls -F ${cur})\" -- \"${cur}\") )
+        dir=\"$(echo ${cur} | grep -o \".*/\")\"
+        if test \"${dir}\" ;then
+            COMPREPLY=( $(compgen -W \"${dir}\"\"$(ls -F ${dir})\" -- \"${cur}\") )
         else 
             COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
         fi
