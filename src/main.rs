@@ -1005,6 +1005,13 @@ alias _log=\"rusgit log\"";
     }
 }
 
+fn complete() {
+    println!("{}", "Used complete-subcommand!".red().bold().to_string());
+    println!("{}", "This is deprecated!".red().bold().to_string());
+    println!("{}", "Please use init-subcommand instead of complete-subcommand!".red().bold().to_string());
+    std::process::exit(1);
+}
+
 fn main() {
     let matches = App::new("rusgit")
         .version("2.0.0")
@@ -1437,6 +1444,74 @@ ARGS:
                          .takes_value(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("complete")
+                    .about("This is old init-subcommand. This is deprecated.")
+                    .arg(Arg::with_name("add")
+                         .help("add-subcommand alias")
+                         .long("add")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("diff")
+                         .help("diff-subcommand alias")
+                         .long("diff")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("branch")
+                         .help("branch-subcommand alias")
+                         .long("branch")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("merge")
+                         .help("merge-subcommand alias")
+                         .long("merge")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("pull")
+                         .help("pull-subcommand alias")
+                         .long("pull")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("push")
+                         .help("push-subcommand alias")
+                         .long("push")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("rebase")
+                         .help("rebase-subcommand alias")
+                         .long("rebase")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("undo")
+                         .help("undo-subcommand alias")
+                         .long("undo")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("tag")
+                         .help("tag-subcommand alias")
+                         .long("tag")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("log")
+                         .help("log-subcommand alias")
+                         .long("log")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("commit")
+                         .help("commit-subcommand alias")
+                         .long("commit")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("clone")
+                         .help("clone-subcommand alias")
+                         .long("clone")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("status")
+                         .help("status-subcommand alias")
+                         .long("status")
+                         .takes_value(true)
+                         )
+                    )
         .get_matches();
 
     let sub_command = matches.subcommand_name().unwrap_or("");
@@ -1457,6 +1532,7 @@ ARGS:
         "undo" => undo(&matches),
         "tag" => tag_trigger(&matches),
         "init" => init(&matches),
+        "complete" => complete(),
         _ => help()
     } 
 }
