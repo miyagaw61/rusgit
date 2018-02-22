@@ -789,7 +789,7 @@ rusgit_complete() {
         else 
             COMPREPLY=( $(compgen -W \"$(ls -F)\" -- \"${cur}\") )
         fi
-    elif test \"$(echo $2 | grep -E \"(branch|merge|pull|push|rebase)\")\" ;then
+    elif test \"$(echo $2 | grep -E \"(branch|merge|pull|push|rebase|integrate)\")\" ;then
         opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
         COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
     elif test \"$2\" = \"undo\" ;then
@@ -995,6 +995,20 @@ alias _log=\"rusgit log\"";
         println!("{}", text);
     }
 
+    if matches.subcommand_matches("init").unwrap().is_present("integrate") {
+        let text = "\
+rusgit__integrate_complete() {
+    local cur prev cword opts
+    _get_comp_words_by_ref -n : cur prev cword
+    opts=\"$(git branch | sed -E 's/\\* //g' | sed -E 's/  //g')\"
+    COMPREPLY=( $(compgen -W \"${opts}\" -- \"${cur}\") )
+}
+complete -F rusgit__integrate_complete _integrate
+alias _integrate=\"rusgit integrate\"";
+        let text = text.replace("_integrate", matches.subcommand_matches("init").unwrap().value_of("integrate").unwrap());
+        println!("{}", text);
+    }
+
     if matches.subcommand_matches("init").unwrap().is_present("commit") {
         println!("{}", ["alias ", matches.subcommand_matches("init").unwrap().value_of("commit").unwrap(), "=\"rusgit commit\""].join("").as_str());
     }
@@ -1013,6 +1027,108 @@ fn complete() {
     println!("{}", "This is deprecated!".red().bold().to_string());
     println!("{}", "Please use init-subcommand instead of complete-subcommand!".red().bold().to_string());
     std::process::exit(1);
+}
+
+fn integrate(matches: &clap::ArgMatches) {
+    let mut stop: String = String::new();
+    let old_branch_name = branch("");
+    if matches.subcommand_matches("integrate").unwrap().is_present("continue") {
+        let mut f = match OpenOptions::new().read(true).write(true).open("/tmp/rusgit_integrate.tmp") {
+            Ok(f) => f,
+            Err(_) => {
+                println!("error: not started yet");
+                std::process::exit(0);
+            }
+        };
+        f.read_to_string(&mut stop).expect("can not read file");
+        //match &stop[..] {
+        //    "pulled" =>
+        //}
+    }
+    let branch_name: &str =  matches.subcommand_matches("integrate").unwrap().value_of("branch").unwrap_or("");
+    match branch_name {
+        "" => {
+            std::process::exit(0);
+        },
+        branch_name => {
+            println!("will checkout.");
+            let result = system_allow_stderr([
+                    "git checkout ",
+                    branch_name
+            ].join("").as_str());
+            println!("checkout-stdout: {}, line: {}", result.stdout, result.stdout.split("\n").count());
+            println!("checkout-stderr: {}, line: {}", result.stderr, result.stderr.split("\n").count());
+            println!("will pull.");
+            let result = system_allow_stderr([
+                    "git pull origin ",
+                    branch_name
+            ].join("").as_str());
+            println!("pull-stdout: {}, line: {}", result.stdout, result.stdout.split("\n").count());
+            println!("pull-stderr: {}, line: {}", result.stderr, result.stderr.split("\n").count());
+            //let stderr: Vec<&str> = result.stderr.split("\n").collect();
+            //match stderr.len() {
+            match result.stderr.split("\n").count() {
+                1 | 2 => {
+                    println!("stderr's line is 1 or 2.");
+                },
+                _ => {
+                    process("echo pull > /tmp/rusgit_integrate.tmp");
+                    std::process::exit(0);
+                },
+            }
+            process([
+                    "git checkout ",
+                    old_branch_name.as_str()
+            ].join("").as_str());
+            println!("will rebase.");
+            let result = system_allow_stderr([
+                    "git rebase ",
+                    branch_name
+            ].join("").as_str());
+            println!("rebase-stdout: {}, line: {}", result.stdout, result.stdout.split("\n").count());
+            println!("rebase-stderr: {}, line: {}", result.stderr, result.stderr.split("\n").count());
+            match result.stderr.split("\n").count() {
+                1 => {
+                    println!("stderr's line is 1.");
+                },
+                _ => {
+                    process("echo rebase > /tmp/rusgit_integrate.tmp");
+                    std::process::exit(0);
+                }
+            }
+            process([
+                    "git checkout ",
+                    branch_name
+            ].join("").as_str());
+            println!("will merge.");
+            let result = system_allow_stderr([
+                                             "git merge ",
+                                             old_branch_name.as_str()
+            ].join("").as_str());
+            println!("merge-stdout: {}, line: {}", result.stdout, result.stdout.split("\n").count());
+            println!("merge-stderr: {}, line: {}", result.stderr, result.stderr.split("\n").count());
+            match result.stderr.split("\n").count() {
+                1 => {
+                    println!("stderr's line is 1.");
+                },
+                _ => {
+                    process("echo merge > /tmp/rusgit_integrate.tmp");
+                    std::process::exit(0);
+                }
+            }
+            //println!("will push.");
+            //let result = system_allow_stderr([
+            //                                 "git push origin ",
+            //                                 branch_name
+            //].join("").as_str());
+            //println!("push-stdout: {}, line: {}", result.stdout, result.stdout.split("\n").count());
+            //println!("push-stderr: {}, line: {}", result.stderr, result.stderr.split("\n").count());
+            //process([
+            //        "git checkout ",
+            //        old_branch_name.as_str()
+            //].join("").as_str());
+        }
+    }
 }
 
 fn main() {
@@ -1446,6 +1562,11 @@ ARGS:
                          .long("status")
                          .takes_value(true)
                          )
+                    .arg(Arg::with_name("integrate")
+                         .help("integrate-subcommand alias")
+                         .long("integrate")
+                         .takes_value(true)
+                         )
                     )
         .subcommand(SubCommand::with_name("complete")
                     .about("This is old init-subcommand. This is deprecated.")
@@ -1514,6 +1635,23 @@ ARGS:
                          .long("status")
                          .takes_value(true)
                          )
+                    .arg(Arg::with_name("integrate")
+                         .help("integrate-subcommand alias")
+                         .long("integrate")
+                         .takes_value(true)
+                         )
+                    )
+        .subcommand(SubCommand::with_name("integrate")
+                    .about("git-integrate")
+                    .arg(Arg::with_name("branch")
+                         .help("branch name")
+                         .takes_value(true)
+                         )
+                    .arg(Arg::with_name("continue")
+                         .help("continue")
+                         .short("c")
+                         .long("continue")
+                         )
                     )
         .get_matches();
 
@@ -1536,6 +1674,7 @@ ARGS:
         "tag" => tag_trigger(&matches),
         "init" => init(&matches),
         "complete" => complete(),
+        "integrate" => integrate(&matches),
         _ => help()
     } 
 }
