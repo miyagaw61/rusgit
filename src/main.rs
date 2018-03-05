@@ -300,6 +300,8 @@ fn diff_trigger(matches: &clap::ArgMatches) {
                  file_vec[..chars_count-2].iter().collect(),
                  "..HEAD".to_string()
             ].join("").as_str());
+        } else {
+            diff(file);
         }
         std::process::exit(0);
     }
