@@ -322,7 +322,7 @@ fn ac_trigger(matches: &clap::ArgMatches) {
     } else if matches.subcommand_matches("ac").unwrap().is_present("improve") {
         let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("improve").unwrap().collect();
         let mut message: String = message.join(" ");
-        ["Improve ", &message].join(" ")
+        ["Improve ", &message].join("")
     } else if matches.subcommand_matches("ac").unwrap().is_present("implement") {
         let mut message: Vec<&str> = matches.subcommand_matches("ac").unwrap().values_of("implement").unwrap().collect();
         let mut message: String = message.join(" ");
